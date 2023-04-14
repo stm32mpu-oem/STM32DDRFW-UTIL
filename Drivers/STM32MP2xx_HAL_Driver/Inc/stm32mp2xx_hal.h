@@ -28,7 +28,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32mp2xx_hal_conf.h"
 
-/** @addtogroup STM32MP1xx_HAL_Driver
+/** @addtogroup STM32MP2xx_HAL_Driver
   * @{
   */
 
@@ -38,8 +38,177 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+/** @defgroup HAL_Exported_Constants HAL Exported Constants
+  * @{
+  */
+ /** @defgroup HDP_Mux HDP Mux
+   * @{
+   */
+ #define  HAL_HDP_MUX0                   (HDP_MUX_MUX0)
+ #define  HAL_HDP_MUX1                   (HDP_MUX_MUX1)
+ #define  HAL_HDP_MUX2                   (HDP_MUX_MUX2)
+ #define  HAL_HDP_MUX3                   (HDP_MUX_MUX3)
+ #define  HAL_HDP_MUX4                   (HDP_MUX_MUX4)
+ #define  HAL_HDP_MUX5                   (HDP_MUX_MUX5)
+ #define  HAL_HDP_MUX6                   (HDP_MUX_MUX6)
+ #define  HAL_HDP_MUX7                   (HDP_MUX_MUX7)
+ /**
+  * @}
+  */
 
-/** @defgroup SYSCFG_Ethernet_Config  Ethernet Config
+/** @defgroup HDP_Signal  HDP Signal
+  * @{
+  */
+/*Signal on HDP0 Mux/signal*/
+#define  HAL_HDP_PWR_PWRWAKE_SYS          (0x00000000UL)
+#define  HAL_HDP_CPU2_SLEEP_DEEP          (HDP_MUX_MUX0_0)
+#define  HAL_HDP_BSEC_OUT_TEST_SDR_UNLOCK (HDP_MUX_MUX0_1)
+#define  HAL_HDP_BSEC_OUT_NIDENM          (HDP_MUX_MUX0_1|HDP_MUX_MUX0_0)
+#define  HAL_HDP_BSEC_OUT_NIDENA          (HDP_MUX_MUX0_2)
+#define  HAL_HDP_CPU2_STATE_0             (HDP_MUX_MUX0_2|HDP_MUX_MUX0_0)
+#define  HAL_HDP_RCC_PWRDS_SYS            (HDP_MUX_MUX0_2|HDP_MUX_MUX0_1)
+#define  HAL_HDP_GPU_DBG7                 (HDP_MUX_MUX0_2|HDP_MUX_MUX0_1|HDP_MUX_MUX0_0)
+#define  HAL_HDP_DDRSS_CSYSREQ_DDRC       (HDP_MUX_MUX0_3)
+#define  HAL_HDP_DDRSS_DFI_PHYUPD_REQ     (HDP_MUX_MUX0_3|HDP_MUX_MUX0_0)
+#define  HAL_HDP_CPU3_SLEEP_DEEP          (HDP_MUX_MUX0_3|HDP_MUX_MUX0_1)
+#define  HAL_HDP_D2_GBL_PER_CLK_BUS_REQ   (HDP_MUX_MUX0_3|HDP_MUX_MUX0_1|HDP_MUX_MUX0_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_0       (HDP_MUX_MUX0_3|HDP_MUX_MUX0_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_8       (HDP_MUX_MUX0_3|HDP_MUX_MUX0_2|HDP_MUX_MUX0_0)
+#define  HAL_HDP_D3_STATE_0               (HDP_MUX_MUX0_3|HDP_MUX_MUX0_2|HDP_MUX_MUX0_1)
+#define  HAL_HDP_GPOVAL_0                 (HDP_MUX_MUX0_3|HDP_MUX_MUX0_2|HDP_MUX_MUX0_1|HDP_MUX_MUX0_0)
+
+/*Signal on HDP1 Mux/signal*/
+#define  HAL_HDP_PWR_PWRWAKE_CPU2       (0x00000000UL)
+#define  HAL_HDP_CPU2_HALTED            (HDP_MUX_MUX1_0)
+#define  HAL_HDP_CPU2_STATE_1           (HDP_MUX_MUX1_1)
+#define  HAL_HDP_BSEC_OUT_DBGENM        (HDP_MUX_MUX1_1|HDP_MUX_MUX1_0)
+#define  HAL_HDP_BSEC_OUT_DBGENA        (HDP_MUX_MUX1_2)
+#define  HAL_HDP_EXTI1_SYS_WAKEUP       (HDP_MUX_MUX1_2|HDP_MUX_MUX1_0)
+#define  HAL_HDP_RCC_PWRDS_CPU2         (HDP_MUX_MUX1_2|HDP_MUX_MUX1_1)
+#define  HAL_HDP_GPU_DBG6               (HDP_MUX_MUX1_2|HDP_MUX_MUX1_1|HDP_MUX_MUX1_0)
+#define  HAL_HDP_DDRSS_CSYSACK_DDRC     (HDP_MUX_MUX1_3)
+#define  HAL_HDP_DDRSS_DFI_PHYMSTR_REQ  (HDP_MUX_MUX1_3|HDP_MUX_MUX1_0)
+#define  HAL_HDP_CPU3_HALTED            (HDP_MUX_MUX1_3|HDP_MUX_MUX1_1)
+#define  HAL_HDP_D2_GBL_PER_DMA_REQ     (HDP_MUX_MUX1_3|HDP_MUX_MUX1_1|HDP_MUX_MUX1_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_1     (HDP_MUX_MUX1_3|HDP_MUX_MUX1_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_9     (HDP_MUX_MUX1_3|HDP_MUX_MUX1_2|HDP_MUX_MUX1_0)
+#define  HAL_HDP_D3_STATE_1             (HDP_MUX_MUX1_3|HDP_MUX_MUX1_2|HDP_MUX_MUX1_1)
+#define  HAL_HDP_GPOVAL_1               (HDP_MUX_MUX1_3|HDP_MUX_MUX1_2|HDP_MUX_MUX1_1|HDP_MUX_MUX1_0)
+
+/*Signal on HDP2 Mux/signal*/
+#define  HAL_HDP_PWR_PWRWAKE_CPU1       (0x00000000UL)
+#define  HAL_HDP_CPU2_RXEV              (HDP_MUX_MUX2_0)
+#define  HAL_HDP_CPU1_NPMUIRQ1          (HDP_MUX_MUX2_1)
+#define  HAL_HDP_CPU1_NFIQOUT1          (HDP_MUX_MUX2_1|HDP_MUX_MUX2_0)
+#define  HAL_HDP_BSEC_OUT_SHDBGEN       (HDP_MUX_MUX2_2)
+#define  HAL_HDP_EXTI1_CPU2_WAKEUP      (HDP_MUX_MUX2_2|HDP_MUX_MUX2_0)
+#define  HAL_HDP_RCC_PWRDS_CPU1         (HDP_MUX_MUX2_2|HDP_MUX_MUX2_1)
+#define  HAL_HDP_GPU_DBG5               (HDP_MUX_MUX2_2|HDP_MUX_MUX2_1|HDP_MUX_MUX2_0)
+#define  HAL_HDP_DDRSS_CACTIVE_DDRC     (HDP_MUX_MUX2_3)
+#define  HAL_HDP_DDRSS_DFI_LP_REQ       (HDP_MUX_MUX2_3|HDP_MUX_MUX2_0)
+#define  HAL_HDP_CPU3_RXEV              (HDP_MUX_MUX2_3|HDP_MUX_MUX2_1)
+#define  HAL_HDP_HPDMA1_CLK_BUS_REQ     (HDP_MUX_MUX2_3|HDP_MUX_MUX2_1|HDP_MUX_MUX2_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_2     (HDP_MUX_MUX2_3|HDP_MUX_MUX2_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_10    (HDP_MUX_MUX2_3|HDP_MUX_MUX2_2|HDP_MUX_MUX2_0)
+#define  HAL_HDP_D3_STATE_2             (HDP_MUX_MUX2_3|HDP_MUX_MUX2_2|HDP_MUX_MUX2_1)
+#define  HAL_HDP_GPOVAL_2               (HDP_MUX_MUX2_3|HDP_MUX_MUX2_2|HDP_MUX_MUX2_1|HDP_MUX_MUX2_0)
+
+/*Signal on HDP3 Mux/signal*/
+#define  HAL_HDP_PWR_SEL_VTH_VDDCPU     (0x00000000UL)
+#define  HAL_HDP_CPU2_TXEV              (HDP_MUX_MUX3_0)
+#define  HAL_HDP_CPU1_NPMUIRQ0          (HDP_MUX_MUX3_1)
+#define  HAL_HDP_CPU1_NFIQOUT0          (HDP_MUX_MUX3_1|HDP_MUX_MUX3_0)
+#define  HAL_HDP_BSEC_OUT_DDBGEN        (HDP_MUX_MUX3_2)
+#define  HAL_HDP_EXTI1_CPU1_WAKEUP      (HDP_MUX_MUX3_2|HDP_MUX_MUX3_0)
+#define  HAL_HDP_CPU3_STATE_0           (HDP_MUX_MUX3_2|HDP_MUX_MUX3_1)
+#define  HAL_HDP_GPU_DBG4               (HDP_MUX_MUX3_2|HDP_MUX_MUX3_1|HDP_MUX_MUX3_0)
+#define  HAL_HDP_DDRSS_MCDCG_EN         (HDP_MUX_MUX3_3)
+#define  HAL_HDP_DDRSS_DFI_FREQ_0       (HDP_MUX_MUX3_3|HDP_MUX_MUX3_0)
+#define  HAL_HDP_CPU3_TXEV              (HDP_MUX_MUX3_3|HDP_MUX_MUX3_1)
+#define  HAL_HDP_HPDMA2_CLK_BUS_REQ     (HDP_MUX_MUX3_3|HDP_MUX_MUX3_1|HDP_MUX_MUX3_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_3     (HDP_MUX_MUX3_3|HDP_MUX_MUX3_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_11    (HDP_MUX_MUX3_3|HDP_MUX_MUX3_2|HDP_MUX_MUX3_0)
+#define  HAL_HDP_D1_STATE_0             (HDP_MUX_MUX3_3|HDP_MUX_MUX3_2|HDP_MUX_MUX3_1)
+#define  HAL_HDP_GPOVAL_3               (HDP_MUX_MUX3_3|HDP_MUX_MUX3_2|HDP_MUX_MUX3_1|HDP_MUX_MUX3_0)     /* Value of PWR_CPU1D1SR_DSTATE[1] bitfield */
+
+/*Signal on HDP4 Mux/signal*/
+#define  HAL_HDP_PWR_SEL_VTH_VDDCORE    (0x00000000UL)
+#define  HAL_HDP_CPU2_SLEEPING          (HDP_MUX_MUX4_0)
+#define  HAL_HDP_CPU1_EVENTO            (HDP_MUX_MUX4_1)
+#define  HAL_HDP_CPU1_NIRQOUT1          (HDP_MUX_MUX4_1|HDP_MUX_MUX4_0)
+#define  HAL_HDP_BSEC_OUT_SPNIDENA      (HDP_MUX_MUX4_2)
+#define  HAL_HDP_EXTI2_D3_WAKEUP        (HDP_MUX_MUX4_2|HDP_MUX_MUX4_0)
+#define  HAL_HDP_ETH1_OUT_PMT_INTR_O    (HDP_MUX_MUX4_2|HDP_MUX_MUX4_1)
+#define  HAL_HDP_GPU_DBG3               (HDP_MUX_MUX4_2|HDP_MUX_MUX4_1|HDP_MUX_MUX4_0)
+#define  HAL_HDP_DDRSS_DPHYCG_EN        (HDP_MUX_MUX4_3)
+#define  HAL_HDP_DDRSS_OBSP0            (HDP_MUX_MUX4_3|HDP_MUX_MUX4_0)
+#define  HAL_HDP_CPU3_SLEEPING          (HDP_MUX_MUX4_3|HDP_MUX_MUX4_1)
+#define  HAL_HDP_HDPMA3_CLK_BUS_REQ      (HDP_MUX_MUX4_3|HDP_MUX_MUX4_1|HDP_MUX_MUX4_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_4     (HDP_MUX_MUX4_3|HDP_MUX_MUX4_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_12    (HDP_MUX_MUX4_3|HDP_MUX_MUX4_2|HDP_MUX_MUX4_0)
+#define  HAL_HDP_D1_STATE_1             (HDP_MUX_MUX4_3|HDP_MUX_MUX4_2|HDP_MUX_MUX4_1)                    /* Value of PWR_CPU1D1SR_DSTATE[1] bitfield */
+#define  HAL_HDP_GPOVAL_4               (HDP_MUX_MUX4_3|HDP_MUX_MUX4_2|HDP_MUX_MUX4_1|HDP_MUX_MUX4_0)
+
+/*Signal on HDP5 Mux/signal*/
+#define  HAL_HDP_CPU1_STANDBYWFI_L2     (0x00000000UL)
+#define  HAL_HDP_HDP5SIGNAL1_RESERVED   (HDP_MUX_MUX5_0)
+#define  HAL_HDP_HDP5SIGNAL2_RESERVED   (HDP_MUX_MUX5_1)
+#define  HAL_HDP_CPU1_NIRQOUT0          (HDP_MUX_MUX5_1|HDP_MUX_MUX5_0)
+#define  HAL_HDP_BSEC_OUT_SPIDENA       (HDP_MUX_MUX5_2)
+#define  HAL_HDP_EXTI2_CPU3_WAKEUP      (HDP_MUX_MUX5_2|HDP_MUX_MUX5_0)
+#define  HAL_HDP_ETH1_OUT_LPI_INTR_O    (HDP_MUX_MUX5_2|HDP_MUX_MUX5_1)
+#define  HAL_HDP_GPU_DBG2               (HDP_MUX_MUX5_2|HDP_MUX_MUX5_1|HDP_MUX_MUX5_0)
+#define  HAL_HDP_DDRSS_DFI_INIT_START   (HDP_MUX_MUX5_3)
+#define  HAL_HDP_DDRSS_OBSP1            (HDP_MUX_MUX5_3|HDP_MUX_MUX5_0)
+#define  HAL_HDP_CPU3_STATE_1           (HDP_MUX_MUX5_3|HDP_MUX_MUX5_1)
+#define  HAL_HDP_D3_GPL_CLK_BUS_REQ     (HDP_MUX_MUX5_3|HDP_MUX_MUX5_1|HDP_MUX_MUX5_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_5     (HDP_MUX_MUX5_3|HDP_MUX_MUX5_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_13    (HDP_MUX_MUX5_3|HDP_MUX_MUX5_2|HDP_MUX_MUX5_0)
+#define  HAL_HDP_D1_STATE_2             (HDP_MUX_MUX5_3|HDP_MUX_MUX5_2|HDP_MUX_MUX5_1)                      /* Value of PWR_CPU1D1SR_DSTATE[2] bitfield */
+#define  HAL_HDP_GPOVAL_5               (HDP_MUX_MUX5_3|HDP_MUX_MUX5_2|HDP_MUX_MUX5_1|HDP_MUX_MUX5_0)
+
+/*Signal on HDP6 Mux/signal*/
+#define  HAL_HDP_CPU1_STANDBYWFI_1      (0x00000000UL)
+#define  HAL_HDP_CPU1_STANDBYWFE_1      (HDP_MUX_MUX6_0)
+#define  HAL_HDP_CPU1_HALTED_1          (HDP_MUX_MUX6_1)
+#define  HAL_HDP_CPU1_NAXIER_RIRQ       (HDP_MUX_MUX6_1|HDP_MUX_MUX6_0)
+#define  HAL_HDP_BSEC_OUT_SPNIDENM      (HDP_MUX_MUX6_2)
+#define  HAL_HDP_EXTI2_CPU2_WAKEUP      (HDP_MUX_MUX6_2|HDP_MUX_MUX6_0)
+#define  HAL_HDP_ETH2_OUT_PMT_INTR_O    (HDP_MUX_MUX6_2|HDP_MUX_MUX6_1)
+#define  HAL_HDP_GPU_DBG1               (HDP_MUX_MUX6_2|HDP_MUX_MUX6_1|HDP_MUX_MUX6_0)
+#define  HAL_HDP_DDRSS_DFI_INIT_CMPLT   (HDP_MUX_MUX6_3)
+#define  HAL_HDP_DDRSS_OBSP2            (HDP_MUX_MUX6_3|HDP_MUX_MUX6_0)
+#define  HAL_HDP_D2_STATE_0             (HDP_MUX_MUX6_3|HDP_MUX_MUX6_1)
+#define  HAL_HDP_D3_GPL_PER_DMA_REQ     (HDP_MUX_MUX6_3|HDP_MUX_MUX6_1|HDP_MUX_MUX6_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_6     (HDP_MUX_MUX6_3|HDP_MUX_MUX6_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_14    (HDP_MUX_MUX6_3|HDP_MUX_MUX6_2|HDP_MUX_MUX6_0)
+#define  HAL_HDP_CPU1_STATE_0           (HDP_MUX_MUX6_3|HDP_MUX_MUX6_2|HDP_MUX_MUX6_1)                      /* Value of PWR_CPU1D1SR_CSTATE[0] bitfield */
+#define  HAL_HDP_GPOVAL_6               (HDP_MUX_MUX6_3|HDP_MUX_MUX6_2|HDP_MUX_MUX6_1|HDP_MUX_MUX6_0)
+
+/*Signal on HDP7 Mux/signal*/
+#define  HAL_HDP_CPU1_STANDBYWFI_0      (0x00000000UL)
+#define  HAL_HDP_CPU1_STANDBYWFE_0      (HDP_MUX_MUX7_0)
+#define  HAL_HDP_CPU1_HALTED_0          (HDP_MUX_MUX7_1)
+#define  HAL_HDP_HDP7SIGNAL3_RESERVED   (HDP_MUX_MUX7_1|HDP_MUX_MUX7_0)
+#define  HAL_HDP_BSEC_OUT_SPIDENM       (HDP_MUX_MUX7_2)
+#define  HAL_HDP_EXTI2_CPU1_WAKEUP      (HDP_MUX_MUX7_2|HDP_MUX_MUX7_0)
+#define  HAL_HDP_ETH2_OUT_LPI_INTR_O    (HDP_MUX_MUX7_2|HDP_MUX_MUX7_1)
+#define  HAL_HDP_GPU_DBG0               (HDP_MUX_MUX7_2|HDP_MUX_MUX7_1|HDP_MUX_MUX7_0)
+#define  HAL_HDP_DDRSS_DFI_CTRLUPD_REQ  (HDP_MUX_MUX7_3)
+#define  HAL_HDP_DDRSS_OBSP3            (HDP_MUX_MUX7_3|HDP_MUX_MUX7_0)
+#define  HAL_HDP_D2_STATE_1             (HDP_MUX_MUX7_3|HDP_MUX_MUX7_1)
+#define  HAL_HDP_LPDMA_CLK_BUS_REQ      (HDP_MUX_MUX7_3|HDP_MUX_MUX7_1|HDP_MUX_MUX7_0)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_7     (HDP_MUX_MUX7_3|HDP_MUX_MUX7_2)
+#define  HAL_HDP_PCIE_USB_CXPL_EI_15    (HDP_MUX_MUX7_3|HDP_MUX_MUX7_2|HDP_MUX_MUX7_0)
+#define  HAL_HDP_CPU1_STATE_1           (HDP_MUX_MUX7_3|HDP_MUX_MUX7_2|HDP_MUX_MUX7_1)                        /* Value of PWR_CPU1D1SR_CSTATE[1:0] bitfield */
+#define  HAL_HDP_GPOVAL_7               (HDP_MUX_MUX7_3|HDP_MUX_MUX7_2|HDP_MUX_MUX7_1|HDP_MUX_MUX7_0)
+
+/**
+ * @}
+ */
+
+
+/** @defgroup SYSCFG_Ethernet_Config  SYSCFG Ethernet Config
   * @{
   */
 #define SYSCFG_ETH_MII                      (0x0U << SYSCFG_ETH1CR_ETH1_SEL_Pos)  /*!< Select the Media Independent Interface */
@@ -57,29 +226,29 @@
   * @}
   */
 
-/** @defgroup SYSCFG_Analog_Switch_Config  Analog Switch Config
+/** @defgroup SYSCFG_Analog_Switch_Config SYSCFG Analog Switch Config
   * @{
   */
 #define SYSCFG_SWITCH_PA0                            SYSCFG_IOCR_ANA0_SEL  /*!< Select PA0 analog switch */
 #define SYSCFG_SWITCH_PA1                            SYSCFG_IOCR_ANA1_SEL  /*!< Select PA1 analog switch */
 
-#define IS_SYSCFG_ANALOG_SWITCH(SWITCH)    ((((SWITCH) & SYSCFG_SWITCH_PA0) == SYSCFG_SWITCH_PA0)|| \
-                                           (((SWITCH) & SYSCFG_SWITCH_PA1) == SYSCFG_SWITCH_PA1))
+#define IS_SYSCFG_ANALOG_SWITCH(SWITCH)               ((((SWITCH) & SYSCFG_SWITCH_PA0) == SYSCFG_SWITCH_PA0)|| \
+                                                     (((SWITCH) & SYSCFG_SWITCH_PA1) == SYSCFG_SWITCH_PA1))
 
 #define SYSCFG_SWITCH_PA0_OPEN                       SYSCFG_IOCR_ANA0_SEL       /*!<  ANA0 internally connected to PA0 */
 #define SYSCFG_SWITCH_PA0_CLOSE                      ((uint32_t)0x00000000)         /*!< PA0 analog is not connected */
 #define SYSCFG_SWITCH_PA1_OPEN                       SYSCFG_IOCR_ANA1_SEL       /*!<  ANA1 internally connected to PA1 */
 #define SYSCFG_SWITCH_PA1_CLOSE                      ((uint32_t)0x00000000)         /*!< PA1 is not connected*/
 
-#define IS_SYSCFG_SWITCH_STATE(STATE)      ((((STATE) & SYSCFG_SWITCH_PA0_OPEN) == SYSCFG_SWITCH_PA0_OPEN)    || \
-                                           (((STATE) & SYSCFG_SWITCH_PA0_CLOSE) == SYSCFG_SWITCH_PA0_CLOSE)   || \
-                                           (((STATE) & SYSCFG_SWITCH_PA1_OPEN) == SYSCFG_SWITCH_PA1_OPEN)     || \
-                                           (((STATE) & SYSCFG_SWITCH_PA1_CLOSE) == SYSCFG_SWITCH_PA1_CLOSE))
+#define IS_SYSCFG_SWITCH_STATE(STATE)                ((((STATE) & SYSCFG_SWITCH_PA0_OPEN) == SYSCFG_SWITCH_PA0_OPEN)    || \
+                                                     (((STATE) & SYSCFG_SWITCH_PA0_CLOSE) == SYSCFG_SWITCH_PA0_CLOSE)   || \
+                                                     (((STATE) & SYSCFG_SWITCH_PA1_OPEN) == SYSCFG_SWITCH_PA1_OPEN)     || \
+                                                     (((STATE) & SYSCFG_SWITCH_PA1_CLOSE) == SYSCFG_SWITCH_PA1_CLOSE))
 /**
   * @}
   */
 
-/** @defgroup SYSCFG_IOControl_HSpeed_Config IOControl HighSpeed Config
+/** @defgroup SYSCFG_IOControl_HSpeed_Config SYSCFG IOControl HighSpeed Config
   * @{
   */
 #define SYSCFG_HIGHSPEED_TRACE_SIGNAL             SYSCFG_IOCR_HSLVEN_TRACE       /*!< High Speed Low Voltage Pad mode Enable when a TRACEx signal is selected in AFMUX */
@@ -127,7 +296,7 @@
   * @}
   */
 
-/** @defgroup SYSCFG_FPU_Interrupts FPU Interrupts
+/** @defgroup SYSCFG_FPU_Interrupts SYSCFG FPU Interrupts
   * @{
   */
 #define SYSCFG_IT_FPU_IDC              SYSCFG_M33SSCR_FPU_IT_EN_5 /*!< Floating Point Unit Input denormal Interrupt */
@@ -147,22 +316,9 @@
   * @}
   */
 
-/** @defgroup EXTI_Event_Input_Config  Event Input Config
-  * @{
-  */
-
-#define EXTI_MODE_IT          ((uint32_t)0x00010000)
-#define EXTI_MODE_EVT         ((uint32_t)0x00020000)
-#define EXTI_RISING_EDGE      ((uint32_t)0x00100000)
-#define EXTI_FALLING_EDGE     ((uint32_t)0x00200000)
-
-#define IS_EXTI_EDGE_LINE(EDGE) (((EDGE) == EXTI_RISING_EDGE) || ((EDGE) == EXTI_FALLING_EDGE))
-#define IS_EXTI_MODE_LINE(MODE) (((MODE) == EXTI_MODE_IT) || ((MODE) == EXTI_MODE_EVT))
-
 /**
   * @}
   */
-
 
 /* Exported macro ------------------------------------------------------------*/
  /** @defgroup HAL_Exported_Macros HAL Exported Macros
@@ -1163,9 +1319,9 @@
  #endif
 #endif /* Cores */
 
- /**
-   * @}
-   */
+/**
+  * @}
+  */
 
 /** @defgroup SYSCFG_Exported_Macros SYSCFG Exported Macros
   * @{
@@ -1188,52 +1344,101 @@
                                                                 CLEAR_BIT(SYSCFG->M33SSCR, (__INTERRUPT__));\
                                                             }while(0)
 #endif /* CORE_CA35 || CORE_CM33 */
- /**
-   * @}
-   */
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 /* Exported functions --------------------------------------------------------*/
+/** @addtogroup HAL_Exported_Functions
+ * @{
+ */
 
+/** @addtogroup HAL_Exported_Functions_Group1
+ * @{
+ */
 /* Initialization and de-initialization functions  ******************************/
-HAL_StatusTypeDef HAL_Init(void);
-HAL_StatusTypeDef HAL_DeInit(void);
-void HAL_MspInit(void);
-void HAL_MspDeInit(void);
-HAL_StatusTypeDef HAL_InitTick (uint32_t TickPriority);
+HAL_StatusTypeDef     HAL_Init(void);
+HAL_StatusTypeDef     HAL_DeInit(void);
+void                  HAL_MspInit(void);
+void                  HAL_MspDeInit(void);
+HAL_StatusTypeDef     HAL_InitTick (uint32_t TickPriority);
+/**
+  * @}
+  */
 
-void HAL_EnableDBGWakeUp(void);
-void HAL_DisableDBGWakeUp(void);
-
+/** @addtogroup HAL_Exported_Functions_Group2
+  * @{
+  */
 /* Peripheral Control functions  ************************************************/
-void HAL_IncTick(void);
-void HAL_Delay(__IO uint32_t Delay);
-uint32_t HAL_GetTick(void);
-void HAL_SuspendTick(void);
-void HAL_ResumeTick(void);
-uint32_t HAL_GetHalVersion(void);
+void                  HAL_IncTick(void);
+void                  HAL_Delay(__IO uint32_t Delay);
+uint32_t              HAL_GetTick(void);
+void                  HAL_SuspendTick(void);
+void                  HAL_ResumeTick(void);
+uint32_t              HAL_GetHalVersion(void);
 #if defined(CORE_CA35) || defined(CORE_CM33)
-uint32_t HAL_GetREVID(void);
-uint32_t HAL_GetDEVID(void);
-void HAL_DBGMCU_EnableWatchdogTimer2CA35Freeze(void);
-void HAL_DBGMCU_DisableWatchdogTimer2CA35Freeze(void);
-void HAL_DBGMCU_EnableDBGSleepMode(void);
-void HAL_DBGMCU_DisableDBGSleepMode(void);
-void HAL_DBGMCU_EnableDBGStopMode(void);
-void HAL_DBGMCU_DisableDBGStopMode(void);
-void HAL_DBGMCU_EnableDBGStandbyMode(void);
-void HAL_DBGMCU_DisableDBGStandbyMode(void);
-void HAL_SYSCFG_ETH1InterfaceSelect(uint32_t SYSCFG_ETHInterface);
-void HAL_SYSCFG_ETH2InterfaceSelect(uint32_t SYSCFG_ETHInterface);
-void HAL_SYSCFG_AnalogSwitchConfig(uint32_t SYSCFG_AnalogSwitch, uint32_t SYSCFG_SwitchState);
-void HAL_SYSCFG_EnableIOSpeedOptimize(uint32_t SYSCFG_HighSpeedSignal);
-void HAL_SYSCFG_DisableIOSpeedOptimize(uint32_t SYSCFG_HighSpeedSignal);
-void HAL_SYSCFG_Lock(uint32_t Item);
-HAL_StatusTypeDef HAL_SYSCFG_GetLock(uint32_t *pItem);
+uint32_t              HAL_GetREVID(void);
+uint32_t              HAL_GetDEVID(void);
+/**
+  * @}
+  */
+
+/** @addtogroup HAL_Exported_Functions_Group3
+  * @{
+  */
+
+/* DBGMCU Peripheral Control functions  ***************************************/
+void                  HAL_DBGMCU_EnableWatchdogTimer2CA35Freeze(void);
+void                  HAL_DBGMCU_DisableWatchdogTimer2CA35Freeze(void);
+void                  HAL_DBGMCU_EnableDBGSleepMode(void);
+void                  HAL_DBGMCU_DisableDBGSleepMode(void);
+void                  HAL_DBGMCU_EnableDBGStopMode(void);
+void                  HAL_DBGMCU_DisableDBGStopMode(void);
+void                  HAL_DBGMCU_EnableDBGStandbyMode(void);
+void                  HAL_DBGMCU_DisableDBGStandbyMode(void);
+/**
+  * @}
+  */
+
+/** @addtogroup HAL_Exported_Functions_Group4
+  * @{
+  */
+/* SYSCFG Peripheral Control functions  ***************************************/
+void                  HAL_HDP_EnableHDP(void);
+void                  HAL_HDP_ConfigHDPMux(uint32_t HDP_Mux, uint32_t HDP_Signal);
+void                  HAL_HDP_WriteGPOVAL(uint32_t GPOVAL_value);
+uint32_t              HAL_HDP_ReadVAL(void);
+/**
+  * @}
+  */
+
+/** @addtogroup HAL_Exported_Functions_Group5
+  * @{
+  */
+
+/* SYSCFG Peripheral Control functions  ***************************************/
+void                  HAL_SYSCFG_ETH1InterfaceSelect(uint32_t SYSCFG_ETHInterface);
+void                  HAL_SYSCFG_ETH2InterfaceSelect(uint32_t SYSCFG_ETHInterface);
+void                  HAL_SYSCFG_AnalogSwitchConfig(uint32_t SYSCFG_AnalogSwitch, uint32_t SYSCFG_SwitchState);
+void                  HAL_SYSCFG_EnableIOSpeedOptimize(uint32_t SYSCFG_HighSpeedSignal);
+void                  HAL_SYSCFG_DisableIOSpeedOptimize(uint32_t SYSCFG_HighSpeedSignal);
+void                  HAL_SYSCFG_Lock(uint32_t Item);
+HAL_StatusTypeDef     HAL_SYSCFG_GetLock(uint32_t *pItem);
+/**
+  * @}
+  */
 #endif /* CORE_CA35 || CORE_CM33 */
 /**
   * @}
   */
 
+/**
+  * @}
+  */
 /**
   * @}
   */

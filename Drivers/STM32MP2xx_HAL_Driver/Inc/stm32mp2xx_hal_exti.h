@@ -88,8 +88,7 @@ typedef struct
   * @{
   */
 
-/** @defgroup EXTI1_Line  EXTI1 Line, conform with c7amba_exti_v3-0_UserSpec_v3_0_0m.pdf
-                                      conform with Panther_interruption_v0.37c.xlsm document 
+/** @defgroup EXTI1_Line  EXTI1 Line
   * @{
   */
 #if ! defined (STM32MP2XX_ASSY3_1_0 )
@@ -267,8 +266,7 @@ typedef struct
 #define EXTI1_GPIO_PIN_MAX                    0u
 #endif
 
-/** @defgroup EXTI2_Line  EXTI2 Line, conform with Panther_interruption_v0.37c.xlsm document 
-                                      conform with c7amba_exti_v3-0_UserSpec_v3_0_0m.pdf
+/** @defgroup EXTI2_Line  EXTI2 Line
   * @{
   */
 #define EXTI2_LINE_0                         (EXTI_EXTI2|EXTI_GPIO     | EXTI_EVENT | 0x00u)

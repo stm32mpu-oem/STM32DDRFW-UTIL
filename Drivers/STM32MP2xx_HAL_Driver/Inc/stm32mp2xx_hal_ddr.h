@@ -379,9 +379,11 @@ typedef struct
 
 HAL_StatusTypeDef HAL_DDR_Init(DDR_InitTypeDef *iddr);
 HAL_StatusTypeDef HAL_DDR_SR_Entry(uint32_t *zq0cr0_zdata);
+HAL_StatusTypeDef HAL_DDR_STDBY_SR_Entry(void);
 HAL_StatusTypeDef HAL_DDR_SR_Exit(void);
 HAL_StatusTypeDef HAL_DDR_SR_SetMode(HAL_DDR_SelfRefreshModeTypeDef mode);
 HAL_DDR_SelfRefreshModeTypeDef HAL_DDR_SR_ReadMode(void);
+HAL_StatusTypeDef HAL_DDR_SetRetentionAreaBase(uint32_t base);
 
 #ifdef DDR_INTERACTIVE
 void HAL_DDR_Convert_Case(const char *in_str, char *out_str, bool ToUpper);

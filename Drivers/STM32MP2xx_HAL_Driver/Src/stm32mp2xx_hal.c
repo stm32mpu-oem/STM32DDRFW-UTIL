@@ -42,15 +42,18 @@
   * @brief HAL module driver.
   * @{
   */
-
+#ifdef HAL_MODULE_ENABLED
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+/** @defgroup HAL_Private_Defines HAL Private Defines
+  * @{
+  */
 /**
  * @brief STM32MP2xx HAL Driver version number
    */
 #define __STM32MP2xx_HAL_VERSION_MAIN   (0x00) /*!< [31:24] main version */
-#define __STM32MP2xx_HAL_VERSION_SUB1   (0x00) /*!< [23:16] sub1 version */
-#define __STM32MP2xx_HAL_VERSION_SUB2   (0x09) /*!< [15:8]  sub2 version */
+#define __STM32MP2xx_HAL_VERSION_SUB1   (0x01) /*!< [23:16] sub1 version */
+#define __STM32MP2xx_HAL_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
 #define __STM32MP2xx_HAL_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
 #define __STM32MP2xx_HAL_VERSION         ((__STM32MP2xx_HAL_VERSION_MAIN << 24)\
                                         |(__STM32MP2xx_HAL_VERSION_SUB1 << 16)\
@@ -63,27 +66,24 @@
   * @}
   */
 
-/** @defgroup HAL_Private_Constants HAL Private Constants
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+/* Exported variables --------------------------------------------------------*/
+/** @defgroup HAL_Exported_Variables HAL Exported Variables
   * @{
   */
-#define SYSCFG_DEFAULT_TIMEOUT 100U
+static __IO uint32_t uwTick;
 /**
   * @}
   */
-
-
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-static __IO uint32_t uwTick;
-
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-
-/** @defgroup HAL_Private_Functions  HAL Private Functions
+/* Exported functions ---------------------------------------------------------*/
+/** @defgroup HAL_Exported_Functions  HAL Exported Functions
   * @{
   */
 
-/** @defgroup HAL_Group1 Initialization and de-initialization Functions
+/** @defgroup HAL_Exported_Functions_Group1 Initialization and de-initialization Functions
  *  @brief    Initialization and de-initialization functions
  *
 @verbatim
@@ -245,7 +245,7 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
 #elif defined (CORE_CM33)
   /* In Cortex-M33 case, configure SysTick period according to platform frequency */
-  /* Should be configured using M33 specifications (doc. Panther_M33_Cluster_v1.3.docx #1.6 pages 10-11) to set SysTick
+  /* Should be configured using M33 specifications to set SysTick
    * !!!!!!!!!!!!!!
    * period according to source clock settings
    * !!!!!!!!!!!!!!
@@ -301,7 +301,7 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   * @}
   */
 
-/** @defgroup HAL_Group2 HAL Control functions
+/** @defgroup HAL_Exported_Functions_Group2 HAL Control functions
  *  @brief    HAL Control functions
  *
 @verbatim
@@ -316,9 +316,6 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
       (+) Get the HAL API driver version
       (+) Get the device identifier
       (+) Get the device revision identifier
-      (+) Enable/Disable Debug module during SLEEP mode
-      (+) Enable/Disable Debug module during STOP mode
-      (+) Enable/Disable Debug module during STANDBY mode
 
 @endverbatim
   * @{
@@ -442,6 +439,15 @@ uint32_t HAL_GetDEVID(void)
 }
 
 /**
+  * @}
+  */
+
+/** @defgroup HAL_Exported_Functions_Group3 DBGMCU Peripheral Control functions
+ *
+  * @{
+  */
+
+/**
   * @brief  If Secure debug is enabled, Freeze IWDG1 only if both CA35 Cores are halted
   * @retval None
   */
@@ -512,42 +518,66 @@ void HAL_DBGMCU_DisableDBGStandbyMode(void)
 {
   CLEAR_BIT(DBGMCU->CR, DBGMCU_CR_DBG_STANDBY);
 }
-#endif /* CORE_CA35 || CORE_CM33 */
 
 /**
-  * @brief  Enable DBG wake up on AIEC
-  * @param  None
+  * @}
+  */
+
+/** @defgroup HAL_Exported_Functions_Group4 HDP Peripheral Control functions
+ *
+  * @{
+  */
+
+/**
+  * @brief  Enable the HDP[7:0] output
+  * @note   Valid if HDP also enabled in BSEC
   * @retval None
   */
-void HAL_EnableDBGWakeUp(void)
+void HAL_HDP_EnableHDP(void)
 {
-/*
- * TODO
-#if defined (CORE_CA35)
-  SET_BIT(EXTI2_C1->IMR3, AIEC_CDBGPWRUPREQ_EVENT);
-#elif defined (CORE_CM33)
-  SET_BIT(EXTI2_C2->IMR3, AIEC_CDBGPWRUPREQ_EVENT);
-#endif
- */
+  SET_BIT(HDP->CTRL, HDP_CTRL_EN);
 }
 
 /**
-  * @brief  Disable DBG wake up on AIEC
-  * @param  None
+  * @brief  Disable the HDP[7:0] output.
   * @retval None
   */
-void HAL_DisableDBGWakeUp(void)
+void HAL_HDP_DisableHDP(void)
 {
-/*
- * TODO
-#if defined (CORE_CA35)
-  CLEAR_BIT(EXTI2_C1->IMR3, AIEC_CDBGPWRUPREQ_EVENT);
-#elif defined (CORE_CM33)
-  CLEAR_BIT(EXTI2_C2->IMR3, AIEC_CDBGPWRUPREQ_EVENT);
-#endif
- */
+  CLEAR_BIT(HDP->CTRL, HDP_CTRL_EN);
 }
-#if defined(CORE_CA35) || defined(CORE_CM33)
+
+/**
+  * @brief  Select the output among the 16 available signals for each mux
+  * @param  HDP_Mux This value is one of @ref HDP_Mux
+  * @param  HDP_Signal This value is one of @ref HDP_Signal
+  * @retval None
+  */
+void HAL_HDP_ConfigHDPMux(uint32_t HDP_Mux, uint32_t HDP_Signal)
+{
+  MODIFY_REG(HDP->MUX , HDP_Mux, HDP_Signal);
+}
+
+/**
+  * @brief  Return the output of VAL register
+  * @param  None
+  * @retval Value of VAL register
+  */
+uint32_t HAL_HDP_ReadVAL(void)
+{
+  return  ((HDP->VAL) & (HDP_VAL_HDPVAL));
+}
+/**
+  * @}
+  */
+
+
+/** @defgroup HAL_Exported_Functions_Group5 SYSCFG Peripheral Control functions
+ *
+  * @{
+  */
+
+
 /*Todo: ETH1CR and ETH2CR have more available options to add*/
 /**
   * @brief  Ethernet PHY Interface Selection either MII, RMII or RGMII
@@ -720,16 +750,17 @@ HAL_StatusTypeDef HAL_SYSCFG_GetLock(uint32_t *pItem)
 
   return HAL_OK;
 }
+
+/**
+  * @}
+  */
+
 #endif /* CORE_CA35 || CORE_CM33 */
 
 /**
   * @}
   */
-
-/**
-  * @}
-  */
-
+#endif /* HAL_MODULE_ENABLED */
 /**
   * @}
   */

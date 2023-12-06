@@ -68,7 +68,9 @@ int32_t stpmic2_write_reg(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t *pdata, uint
   * @param  value data to write
   * @retval Component status
   */
-int32_t stpmic2_register_set(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t value)
+int32_t stpmic2_register_set(__attribute__((unused)) stpmic2_ctx_t *ctx,
+                             __attribute__((unused)) uint16_t reg,
+                             __attribute__((unused)) uint8_t value)
 {
   return 0;
 }
@@ -79,7 +81,9 @@ int32_t stpmic2_register_set(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t value)
   * @param  pvalue Pointer to data to write
   * @retval Component status
   */
-int32_t stpmic2_register_get(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t *pvalue)
+int32_t stpmic2_register_get(__attribute__((unused)) stpmic2_ctx_t *ctx,
+                             __attribute__((unused)) uint16_t reg,
+                             __attribute__((unused)) uint8_t *pvalue)
 {
   return 0;
 }
@@ -91,7 +95,10 @@ int32_t stpmic2_register_get(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t *pvalue)
   * @param  mask data mask
   * @retval Component status
   */
-int32_t stpmic2_register_update(stpmic2_ctx_t *ctx, uint16_t reg, uint8_t pvalue, uint8_t mask)
+int32_t stpmic2_register_update(__attribute__((unused)) stpmic2_ctx_t *ctx,
+                                __attribute__((unused)) uint16_t reg,
+                                __attribute__((unused)) uint8_t pvalue,
+                                __attribute__((unused)) uint8_t mask)
 {
   return 0;
 }

@@ -36,33 +36,33 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-static int get_addr(uint32_t addr_in, uint32_t *addr)
+static int get_addr(unsigned long addr_in, uintptr_t **addr)
 {
-  if (addr_in != 0)
+  if (addr_in != 0UL)
   {
-    if (addr_in < DDR_BASE_ADDR)
+    if (addr_in < DDR_MEM_BASE)
     {
       printf("Address too low: 0x%lx\n\r", addr_in);
       return -1;
     }
 
-    if ((addr_in & 0x3) != 0)
+    if ((addr_in & 0x3UL) != 0UL)
     {
       printf("Unaligned address: 0x%lx\n\r", addr_in);
       return -1;
     }
 
-    *addr = addr_in;
+    *addr = (uintptr_t *)addr_in;
   }
   else
   {
-    *addr = DDR_BASE_ADDR;
+    *addr = (uintptr_t *)DDR_MEM_BASE;
   }
 
   return 0;
 }
 
-static void get_nb_loop(uint32_t loop_in, uint32_t *nb_loop,
+static void get_nb_loop(unsigned long loop_in, uint32_t *nb_loop,
                         uint32_t default_nb_loop)
 {
   if (loop_in != 0)
@@ -72,7 +72,15 @@ static void get_nb_loop(uint32_t loop_in, uint32_t *nb_loop,
       printf("Warning: infinite loop requested\n\r");
     }
 
-    *nb_loop = loop_in;
+    if (loop_in > 0xFFFFFFFF)
+    {
+      printf("Warning: incorrect loop_number, forced to default value\n\r");
+      *nb_loop = default_nb_loop;
+    }
+    else
+    {
+      *nb_loop = (uint32_t)loop_in;
+    }
   }
   else
   {
@@ -80,21 +88,21 @@ static void get_nb_loop(uint32_t loop_in, uint32_t *nb_loop,
   }
 }
 
-static int get_buf_size(uint32_t size_in, uint32_t *size,
-                        uint32_t default_size, uint32_t min_size)
+static int get_buf_size(unsigned long size_in, unsigned long *size,
+                        unsigned long default_size, unsigned long min_size)
 {
   if (size_in != 0)
   {
-    if ((size_in < min_size) || (size_in > DDR_MEM_SIZE))
+    if ((size_in < min_size) || (size_in > (unsigned long)DDR_MEM_SIZE))
     {
       printf("Invalid size: 0x%lx\n\r", size_in);
-      printf("  (range = 0x%lx..0x%x)\n\r", min_size, DDR_MEM_SIZE);
+      printf("  (range = 0x%lx..0x%lx)\n\r", min_size, (unsigned long)DDR_MEM_SIZE);
       return -1;
     }
 
     if ((size_in & (min_size - 1)) != 0)
     {
-      printf("Unaligned size: 0x%lx (min=%ld)\n\r", size_in, min_size);
+      printf("Unaligned size: 0x%lx (min=0x%lx)\n\r", size_in, min_size);
       return -1;
     }
 
@@ -108,13 +116,13 @@ static int get_buf_size(uint32_t size_in, uint32_t *size,
   return 0;
 }
 
-static bool is_power_of_2(uint32_t n)
+static bool is_power_of_2(unsigned long n)
 {
   return ((n != 0) && ((n & (n - 1)) == 0));
 }
 
-static void get_pattern(uint32_t pattern_in, uint32_t *pattern,
-                        uint32_t default_pattern)
+static void get_pattern(unsigned long pattern_in, unsigned long *pattern,
+		unsigned long default_pattern)
 {
   if (pattern_in != 0)
   {
@@ -158,10 +166,10 @@ static int test_loop_end(uint32_t *loop, uint32_t nb_loop)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Databus(uint32_t addr_in)
+uint32_t DDR_Test_Databus(unsigned long addr_in)
 {
-  uint32_t pattern;
-  uint32_t addr;
+  unsigned long pattern;
+  uintptr_t *addr = NULL;
 
   if (get_addr(addr_in, &addr) != 0)
   {
@@ -170,11 +178,11 @@ uint32_t DDR_Test_Databus(uint32_t addr_in)
 
   for (pattern = 1U; pattern != 0U; pattern <<= 1)
   {
-    WRITE_REG(*(volatile uint32_t*)addr, pattern);
+    *addr = pattern;
 
-    if (READ_REG(*(volatile uint32_t*)addr) != pattern)
+    if (*addr != pattern)
     {
-      printf("  test_databus KO @ 0x%lx \n\r", addr);
+      printf("  test_databus KO @ 0x%lx \n\r", (unsigned long)addr);
       return 2;
     }
   }
@@ -182,12 +190,12 @@ uint32_t DDR_Test_Databus(uint32_t addr_in)
   return 0;
 }
 
-static int test_databuswalk(uint8_t mode, uint32_t loop_in, uint32_t addr_in)
+static int test_databuswalk(uint8_t mode, unsigned long loop_in, unsigned long addr_in)
 {
   int i;
-  uint32_t addr;
-  uint32_t data;
-  uint32_t error = 0U;
+  uintptr_t *addr = NULL;
+  unsigned long data;
+  unsigned long error = 0U;
   uint32_t loop = 0;
   uint32_t nb_loop;
 
@@ -200,23 +208,23 @@ static int test_databuswalk(uint8_t mode, uint32_t loop_in, uint32_t addr_in)
 
   while (error == 0U)
   {
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < (int)(sizeof(unsigned long) * 8); i++)
     {
-      uint32_t pattern = mode ? (1 << i) : ~(1 << i);
+      unsigned long pattern = mode ? (1 << i) : ~(1 << i);
 
-      WRITE_REG(*(volatile uint32_t*)(addr + sizeof(uint32_t) * i), pattern);
+      *(addr + sizeof(unsigned long) * i) = pattern;
     }
 
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < (int)(sizeof(unsigned long) * 8); i++)
     {
-      uint32_t pattern = mode ? (1 << i) : ~(1 << i);
+      unsigned long pattern = mode ? (1 << i) : ~(1 << i);
 
-      data = READ_REG(*(volatile uint32_t*)(addr + sizeof(uint32_t) * i));
+      data = *(addr + sizeof(unsigned long) * i);
       if (pattern !=  data)
       {
         error |= 1 << i;
-        printf("  %lx: error %lx expected %lx => error:%lx\n\r",
-                addr + sizeof(uint32_t) * i, data, pattern, error);
+        printf("  0x%lx: error 0x%lx expected 0x%lx => error:0x%lx\n\r",
+               (unsigned long)(addr + sizeof(unsigned long) * i), data, pattern, error);
       }
     }
 
@@ -225,9 +233,9 @@ static int test_databuswalk(uint8_t mode, uint32_t loop_in, uint32_t addr_in)
       break;
     }
 
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < (int)(sizeof(unsigned long) * 8); i++)
     {
-      WRITE_REG(*(volatile uint32_t*)(addr + sizeof(uint32_t) * i), 0);
+      *(addr + sizeof(unsigned long) * i) = 0;
     }
   }
 
@@ -259,7 +267,7 @@ static int test_databuswalk(uint8_t mode, uint32_t loop_in, uint32_t addr_in)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_DatabusWalk0(uint32_t loop, uint32_t addr)
+uint32_t DDR_Test_DatabusWalk0(unsigned long loop, unsigned long addr)
 {
   return test_databuswalk(0, loop, addr);
 }
@@ -283,7 +291,7 @@ uint32_t DDR_Test_DatabusWalk0(uint32_t loop, uint32_t addr)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_DatabusWalk1(uint32_t loop, uint32_t addr)
+uint32_t DDR_Test_DatabusWalk1(unsigned long loop, unsigned long addr)
 {
   return test_databuswalk(1, loop, addr);
 }
@@ -316,17 +324,55 @@ uint32_t DDR_Test_DatabusWalk1(uint32_t loop, uint32_t addr)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_AddressBus(uint32_t size_in, uint32_t addr_in)
+uint32_t DDR_Test_AddressBus(unsigned long size_in, unsigned long addr_in)
 {
-  uint32_t addr;
-  uint32_t size;
-  uint64_t addressmask;
-  uint64_t offset;
-  uint64_t testoffset = 0;
-  uint32_t pattern     = 0xAAAAAAAA;
-  uint32_t antipattern = 0x55555555;
+  uintptr_t *addr = NULL;
+  unsigned long size;
+  unsigned long dflt_size;
+  unsigned long addressmask;
+  unsigned long offset;
+  unsigned long testoffset = 0;
+  unsigned long pattern     = 0xAAAAAAAAAAAAAAAA;
+  unsigned long antipattern = 0x5555555555555555;
+  unsigned long data;
 
-  if (get_buf_size(size_in, &size, DDR_MEM_SIZE, 4) != 0)
+  if (!is_power_of_2(DDR_MEM_SIZE))
+  {
+    /* Get the bigger 2^n value of DDR_MEM_SIZE */
+    if ((DDR_MEM_SIZE & 0x100000000) == 0x100000000)
+    {
+      dflt_size = 0x100000000;
+    }
+    else if ((DDR_MEM_SIZE & 0x80000000) == 0x80000000)
+    {
+      dflt_size = 0x80000000;
+    }
+    else if ((DDR_MEM_SIZE & 0x40000000) == 0x40000000)
+    {
+      dflt_size = 0x40000000;
+    }
+    else if ((DDR_MEM_SIZE & 0x20000000) == 0x20000000)
+    {
+      dflt_size = 0x20000000;
+    }
+    else if ((DDR_MEM_SIZE & 0x10000000) == 0x10000000)
+    {
+      dflt_size = 0x10000000;
+    }
+    else
+    {
+      printf("DDR size too low for this test (0x%lx)\n\r",
+             (unsigned long)DDR_MEM_SIZE);
+
+      return 2;
+    }
+  }
+  else
+  {
+    dflt_size = DDR_MEM_SIZE;
+  }
+
+  if (get_buf_size(size_in, &size, dflt_size, 4) != 0)
   {
     return 1;
   }
@@ -345,53 +391,64 @@ uint32_t DDR_Test_AddressBus(uint32_t size_in, uint32_t addr_in)
   addressmask = size - 1;
 
   /* Write the default pattern at each of the power-of-two offsets. */
-  for (offset = sizeof(uint32_t); (offset & addressmask) != 0U; offset <<= 1)
+  for (offset = 1U;
+       ((offset & addressmask) != 0U) &&
+       ((offset * sizeof(unsigned long)) != dflt_size);
+       offset <<= 1)
   {
-    WRITE_REG(*(volatile uint32_t*)(addr + (uint32_t)offset), pattern);
+    *(addr + offset) = pattern;
   }
 
   /* Check for address bits stuck high. */
-  WRITE_REG(*(volatile uint32_t*)(addr + (uint32_t)testoffset), antipattern);
+  *(addr + testoffset) = antipattern;
 
-  for (offset = sizeof(uint32_t);
-       ((offset & addressmask) != 0U) && (offset != DDR_MEM_SIZE);
+  for (offset = 1U;
+       ((offset & addressmask) != 0U) &&
+       ((offset * sizeof(unsigned long)) != dflt_size);
        offset <<= 1)
   {
-    if (READ_REG(*(volatile uint32_t*)(addr + (uint32_t)offset)) != pattern)
+    data = *(addr + offset);
+    if (data != pattern)
     {
-      printf("  test_addrbus KO @ 0x%lx \n\r", addr + (uint32_t)offset);
+      printf("  test_addrbus KO @ 0x%lx \n\r", (unsigned long)(addr + offset));
+      printf("  read 0x%lx instead of 0x%lx\n\r", data, pattern);
       return 4;
     }
   }
 
-  WRITE_REG(*(volatile uint32_t*)(addr + (uint32_t)testoffset), pattern);
+  *(addr + testoffset) = pattern;
 
   /* Check for address bits stuck low or shorted. */
-  for (testoffset = sizeof(uint32_t);
-       ((testoffset & addressmask) != 0U)  && (testoffset != DDR_MEM_SIZE);
+  for (testoffset = 1U;
+       ((testoffset & addressmask) != 0U) &&
+       ((testoffset * sizeof(unsigned long)) != dflt_size);
        testoffset <<= 1)
   {
-    WRITE_REG(*(volatile uint32_t*)(addr + (uint32_t)testoffset), antipattern);
+    *(addr + testoffset) = antipattern;
 
-    if (READ_REG(*(volatile uint32_t*)addr) != pattern)
+    data = *addr;
+    if (data != pattern)
     {
-      printf("  test_addrbus KO @ 0x%lx \n\r", addr + (uint32_t)testoffset);
+      printf("  test_addrbus KO @ 0x%lx \n\r", (unsigned long)(addr + testoffset));
+      printf("  read 0x%lx instead of 0x%lx\n\r", data, pattern);
       return 5;
     }
 
-    for (offset = sizeof(uint32_t);
-         ((offset & addressmask) != 0U) && (offset != DDR_MEM_SIZE);
+    for (offset = 1U;
+         ((offset & addressmask) != 0U) &&
+         ((offset * sizeof(unsigned long)) != dflt_size);
          offset <<= 1)
     {
-      if ((READ_REG(*(volatile uint32_t*)(addr + (uint32_t)offset)) != pattern)
-          && (offset != testoffset))
+     data = *(addr + offset);
+     if ((data != pattern) && (offset != testoffset))
       {
-        printf("  test_addrbus KO @ 0x%lx \n\r", addr + (uint32_t)offset);
+        printf("  test_addrbus KO @ 0x%lx \n\r", (unsigned long)(addr + offset));
+        printf("  read 0x%lx instead of 0x%lx\n\r", data, pattern);
         return 6;
       }
     }
 
-    WRITE_REG(*(volatile uint32_t*)(addr + (uint32_t)testoffset), pattern);
+    *(addr + testoffset) = pattern;
   }
 
   return 0;
@@ -419,14 +476,14 @@ uint32_t DDR_Test_AddressBus(uint32_t size_in, uint32_t addr_in)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_MemDevice(uint32_t size_in, uint32_t addr_in)
+uint32_t DDR_Test_MemDevice(unsigned long size_in, unsigned long addr_in)
 {
-  uint32_t addr;
-  uint32_t size;
-  uint64_t nb_words;
-  uint32_t offset;
-  uint32_t pattern;
-  uint32_t antipattern;
+  uintptr_t *addr = NULL;
+  unsigned long size;
+  unsigned long nb_words;
+  unsigned long offset;
+  unsigned long pattern;
+  unsigned long antipattern;
 
   if (get_buf_size(size_in, &size, 4 * 1024, 4) != 0)
   {
@@ -438,40 +495,37 @@ uint32_t DDR_Test_MemDevice(uint32_t size_in, uint32_t addr_in)
     return 2;
   }
 
-  nb_words = size / sizeof(uint32_t);
+  nb_words = size / sizeof(unsigned long);
 
-  log_dbg("Fill with pattern\n\r");
   /* Fill memory with a known pattern. */
   for (pattern = 1, offset = 0; offset < nb_words;
-       pattern++, offset += sizeof(uint32_t))
+       pattern++, offset += sizeof(unsigned long))
   {
-    WRITE_REG(*(volatile uint32_t*)(addr + offset), pattern);
+    *(addr + offset) = pattern;
   }
 
-  log_dbg("Check and invert pattern\n\r");
   /* Check each location and invert it for the second pass. */
   for (pattern = 1, offset = 0; offset < nb_words;
-       pattern++, offset += sizeof(uint32_t))
+       pattern++, offset += sizeof(unsigned long))
   {
-    if (READ_REG(*(volatile uint32_t*)(addr + offset)) != pattern)
+    if (*(addr + offset) != pattern)
     {
-      printf("  test_memdevice KO @ 0x%lx \n\r", addr + offset);
+      printf("  test_memdevice KO @ 0x%lx \n\r", (unsigned long)(addr + offset));
       return 3;
     }
 
     antipattern = ~pattern;
-    WRITE_REG(*(volatile uint32_t*)(addr + offset), antipattern);
+    *(addr + offset) = antipattern;
   }
 
-  log_dbg("Check inverted pattern\n\r");
   /* Check each location for the inverted pattern and zero it. */
   for (pattern = 1, offset = 0; offset < nb_words;
-       pattern++, offset += sizeof(uint32_t))
+       pattern++, offset += sizeof(unsigned long))
   {
     antipattern = ~pattern;
-    if (READ_REG(*(volatile uint32_t*)(addr + offset)) != antipattern)
+    if (*(addr + offset) != antipattern)
     {
-      printf("  test_memdevice KO @ 0x%lx \n\r", addr + offset);
+      printf("  test_memdevice KO @ 0x%lx \n\r", (unsigned long)(addr + offset));
       return 4;
     }
   }
@@ -508,15 +562,15 @@ uint32_t DDR_Test_MemDevice(uint32_t size_in, uint32_t addr_in)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_SimultaneousSwitchingOutput(uint32_t size_in,
-                                                  uint32_t addr_in)
+uint32_t DDR_Test_SimultaneousSwitchingOutput(unsigned long size_in,
+                                              unsigned long addr_in)
 {
   int i, j;
-  uint32_t addr;
-  uint32_t size;
-  uint32_t remaining;
-  uint32_t offset;
-  uint32_t data = 0;
+  uintptr_t *addr = NULL;
+  unsigned long size;
+  unsigned long remaining;
+  unsigned long offset;
+  unsigned long data = 0;
 
   if (get_buf_size(size_in, &size, 4 * 1024, 4) != 0)
   {
@@ -528,12 +582,12 @@ uint32_t DDR_Test_SimultaneousSwitchingOutput(uint32_t size_in,
     return 2;
   }
 
-  log_dbg("running sso at 0x%lx length 0x%lx\n\r", addr, size);
-  offset = addr;
+  //printf("running sso at 0x%lx length 0x%lx\n\r", (uint32_t)addr, size);
+  offset = 0;
   remaining = size;
 
   while (remaining) {
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < (int)(sizeof(unsigned long) * 8); i++) {
       /* write pattern. */
       for (j = 0; j < 6; j++) {
         switch (j)
@@ -554,58 +608,75 @@ uint32_t DDR_Test_SimultaneousSwitchingOutput(uint32_t size_in,
             break;
         }
 
-        WRITE_REG(*(volatile uint32_t*)offset, data);
+        *(addr + offset) = data;
 
-        if (READ_REG(*(volatile uint32_t*)offset) != data)
+        if (*(addr + offset) != data)
         {
-          printf("  test_sso KO @ 0x%lx \n\r", offset);
+          printf("  test_sso KO @ 0x%lx \n\r", (unsigned long)(addr + offset));
           return 3;
         }
       }
     }
-    offset += sizeof(uint32_t);
-    remaining -= sizeof(uint32_t);
+    offset ++;
+    remaining -= sizeof(unsigned long);
   }
 
   return 0;
 }
 
-static void do_noise(uint32_t addr, uint32_t pattern, uint32_t *result)
+static void do_noise(unsigned long addr, unsigned long pattern,
+                     unsigned long *result)
 {
-  __asm volatile ("PUSH {r2-r10}         \n"
-                  "MOV r0, %[addr]       \n"
-                  "MOV r1, %[pattern]    \n"
-                  "MOV r11, %[result]    \n"
+  __asm volatile (
+//                "PUSH {x2-x10}            \n"
+                  "STP x2, x3, [sp, #-16]!  \n"
+                  "STP x4, x5, [sp, #-16]!  \n"
+                  "STP x6, x7, [sp, #-16]!  \n"
+                  "STP x8, x9, [sp, #-16]!  \n"
+                  "STP x10, x11, [sp, #-16]!\n"
 
-                  "MVN r2, r1            \n"
+                  "MOV x0, %[addr]          \n"
+                  "MOV x1, %[pattern]       \n"
+                  "MOV x12, %[result]       \n"
 
-                  "STR r1, [r0]          \n"
-                  "LDR r3, [r0]          \n"
-                  "STR r2, [r0]          \n"
-                  "LDR r4, [r0]          \n"
+                  "MVN x2, x1               \n"
 
-                  "STR r1, [r0]          \n"
-                  "LDR r5, [r0]          \n"
-                  "STR r2, [r0]          \n"
-                  "LDR r6, [r0]          \n"
+                  "STR x1, [x0]             \n"
+                  "LDR x3, [x0]             \n"
+                  "STR x2, [x0]             \n"
+                  "LDR x4, [x0]             \n"
 
-                  "STR r1, [r0]          \n"
-                  "LDR r7, [r0]          \n"
-                  "STR r2, [r0]          \n"
-                  "LDR r8, [r0]          \n"
+                  "STR x1, [x0]             \n"
+                  "LDR x5, [x0]             \n"
+                  "STR x2, [x0]             \n"
+                  "LDR x6, [x0]             \n"
 
-                  "STR r1, [r0]          \n"
-                  "LDR r9, [r0]          \n"
-                  "STR r2, [r0]          \n"
-                  "LDR r10, [r0]         \n"
+                  "STR x1, [x0]             \n"
+                  "LDR x7, [x0]             \n"
+                  "STR x2, [x0]             \n"
+                  "LDR x8, [x0]             \n"
 
-                  "STMIA r11!, {r3-r10}  \n"
+                  "STR x1, [x0]             \n"
+                  "LDR x9, [x0]             \n"
+                  "STR x2, [x0]             \n"
+                  "LDR x10, [x0]            \n"
 
-                  "POP {r2-r10}          \n"
+//                "STMIA x12!, {x3-x10}     \n"
+                  "STP x3, x4, [x12], #16   \n"
+                  "STP x5, x6, [x12], #16   \n"
+                  "STP x7, x8, [x12], #16   \n"
+                  "STP x9, x10, [x12], #16  \n"
+
+//                "POP {x2-x10}             \n"
+                  "LDP x2, x3, [sp], #16    \n"
+                  "LDP x4, x5, [sp], #16    \n"
+                  "LDP x6, x7, [sp], #16    \n"
+                  "LDP x8, x9, [sp], #16    \n"
+                  "LDP x10, x11, [sp], #16  \n"
                   ::[addr]    "r" (addr),
                     [pattern] "r" (pattern),
                     [result]  "r" (result)
-                  : "r0", "r1", "r11");
+                  : "x0", "x1", "x12");
 }
 
 
@@ -630,31 +701,32 @@ static void do_noise(uint32_t addr, uint32_t pattern, uint32_t *result)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Noise(uint32_t pattern_in, uint32_t addr_in)
+uint32_t DDR_Test_Noise(unsigned long pattern_in, unsigned long addr_in)
 {
-  uint32_t pattern;
-  uint32_t addr;
-  uint32_t result[8] = {0,0,0,0,0,0,0,0};
+  unsigned long pattern;
+  unsigned long dflt_pattern = 0xFFFFFFFFFFFFFFFF;
+  uintptr_t *addr = NULL;
+  unsigned long result[8] = {0,0,0,0,0,0,0,0};
   int i;
 
-  get_pattern(pattern_in, &pattern, 0xFFFFFFFF);
+  get_pattern(pattern_in, &pattern, dflt_pattern);
 
   if (get_addr(addr_in, &addr) != 0)
   {
     return 1;
   }
 
-  do_noise(addr, pattern, result);
+  do_noise((unsigned long)addr, pattern, result);
 
   for (i = 0; i < 8;)
   {
-    if (READ_REG(*(volatile uint32_t*)(&result[i++])) != pattern)
+    if (*(&result[i++]) != pattern)
     {
       printf("  test_noise KO @ 0x%lx \n\r", result[i - 1]);
       return 2;
     }
 
-    if (READ_REG(*(volatile uint32_t*)(&result[i++])) != ~pattern)
+    if (*(&result[i++]) != ~pattern)
     {
       printf("  test_noise KO @ 0x%lx \n\r", result[i - 1]);
       return 3;
@@ -664,33 +736,66 @@ uint32_t DDR_Test_Noise(uint32_t pattern_in, uint32_t addr_in)
   return 0;
 }
 
-static void do_noiseburst(uint32_t addr, uint32_t pattern, size_t bufsize)
+static void do_noiseburst(unsigned long addr, unsigned long pattern,
+                          unsigned long bufsize)
 {
-  __asm volatile ("PUSH {r2-r8}          \n"
-                  "MOV r0, %[addr]       \n"
-                  "MOV r1, %[pattern]    \n"
-                  "MOV r9, %[bufsize]    \n"
+  __asm volatile (
+//                "PUSH {x2-x8}             \n"
+                  "STP x2, x3, [sp, #-16]!  \n"
+                  "STP x4, x5, [sp, #-16]!  \n"
+                  "STP x6, x7, [sp, #-16]!  \n"
+                  "STP x8, x9, [sp, #-16]!  \n"
 
-                  "MVN r2, r1            \n"
-                  "MOV r3, r1            \n"
-                  "MOV r4, r2            \n"
-                  "MOV r5, r1            \n"
-                  "MOV r6, r2            \n"
-                  "MOV r7, r1            \n"
-                  "MOV r8, r2            \n"
+                  "MOV x0, %[addr]          \n"
+                  "MOV x1, %[pattern]       \n"
+                  "MOV x10, %[bufsize]      \n"
 
-                  "loop1:                \n"
-                  "STMIA r0!, {r1-r8}    \n"
-                  "STMIA r0!, {r1-r8}    \n"
-                  "STMIA r0!, {r1-r8}    \n"
-                  "STMIA r0!, {r1-r8}    \n"
-                  "SUBS r9, r9, #128     \n"
-                  "BGE loop1             \n"
-                  "POP {r2-r8}           \n"
+                  "MVN x2, x1               \n"
+                  "MOV x3, x1               \n"
+                  "MOV x4, x2               \n"
+                  "MOV x5, x1               \n"
+                  "MOV x6, x2               \n"
+                  "MOV x7, x1               \n"
+                  "MOV x8, x2               \n"
+
+                  "loop1:                   \n"
+
+//                "STMIA x0!, {x1-x8}       \n"
+                  "STP x1, x2, [x0], #16    \n"
+                  "STP x3, x4, [x0], #16    \n"
+                  "STP x5, x6, [x0], #16    \n"
+                  "STP x7, x8, [x0], #16    \n"
+
+//                "STMIA x0!, {x1-x8}       \n"
+                  "STP x1, x2, [x0], #16    \n"
+                  "STP x3, x4, [x0], #16    \n"
+                  "STP x5, x6, [x0], #16    \n"
+                  "STP x7, x8, [x0], #16    \n"
+
+//                "STMIA x0!, {x1-x8}       \n"
+                  "STP x1, x2, [x0], #16    \n"
+                  "STP x3, x4, [x0], #16    \n"
+                  "STP x5, x6, [x0], #16    \n"
+                  "STP x7, x8, [x0], #16    \n"
+
+//                "STMIA x0!, {x1-x8}       \n"
+                  "STP x1, x2, [x0], #16    \n"
+                  "STP x3, x4, [x0], #16    \n"
+                  "STP x5, x6, [x0], #16    \n"
+                  "STP x7, x8, [x0], #16    \n"
+
+                  "SUBS x10, x10, #256      \n"
+                  "BGE loop1                \n"
+
+//                "POP {x2-x8}              \n"
+                  "LDP x2, x3, [sp], #16    \n"
+                  "LDP x4, x5, [sp], #16    \n"
+                  "LDP x6, x7, [sp], #16    \n"
+                  "LDP x8, x9, [sp], #16    \n"
                   ::[addr]    "r" (addr),
                     [pattern] "r" (pattern),
                     [bufsize] "r" (bufsize)
-                  : "r0", "r1", "r9");
+                  : "x0", "x1", "x10");
 }
 
 #define DDR_CHUNK_SIZE  0x08000000
@@ -716,16 +821,17 @@ static void do_noiseburst(uint32_t addr, uint32_t pattern, size_t bufsize)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_NoiseBurst(uint32_t size_in, uint32_t pattern_in,
-                                 uint32_t addr_in)
+uint32_t DDR_Test_NoiseBurst(unsigned long size_in, unsigned long pattern_in,
+                             unsigned long addr_in)
 {
-  uint32_t pattern;
-  uint32_t addr;
-  uint32_t offset;
-  uint32_t bufsize;
-  size_t remaining;
-  size_t size;
-  int i;
+  unsigned long pattern;
+  uintptr_t *addr = NULL;
+  unsigned long offset;
+  unsigned long bufsize;
+  unsigned long data;
+  unsigned long remaining;
+  unsigned long size;
+  unsigned long i;
 
   if (get_buf_size(size_in, &bufsize, 4 * 1024, 128) != 0)
   {
@@ -739,8 +845,8 @@ uint32_t DDR_Test_NoiseBurst(uint32_t size_in, uint32_t pattern_in,
     return 2;
   }
 
-  offset = addr;
-  remaining = (size_t)bufsize;
+  offset = 0;
+  remaining = bufsize;
   size = DDR_CHUNK_SIZE;
 
   while (remaining)
@@ -750,28 +856,32 @@ uint32_t DDR_Test_NoiseBurst(uint32_t size_in, uint32_t pattern_in,
       size = remaining;
     }
 
-    do_noiseburst(offset, pattern, size);
+    do_noiseburst((unsigned long)(addr + offset), pattern, size);
     remaining -= size;
     offset += size;
   }
 
-  for (i = 0; i < bufsize;)
+  for (i = 0; i < bufsize / sizeof(unsigned long);)
   {
-    if (READ_REG(*(volatile uint32_t*)(addr + i)) != pattern)
+    data = *(addr + i);
+    if (data != pattern)
     {
-      printf("  test_noiseburst KO @ 0x%lx\n\r", addr + i);
+      printf("  test_noiseburst KO @ 0x%lx\n\r", (unsigned long)(addr + i));
+      printf("  read 0x%lx instead of 0x%lx\n\r", data, pattern);
       return 3;
     }
 
-    i += sizeof(uint32_t);
+    i++;
 
-    if (READ_REG(*(volatile uint32_t*)(addr + i)) != ~pattern)
+    data = *(addr + i);
+    if (data != ~pattern)
     {
-      printf("  test_noiseburst KO @ 0x%lx\n\r", addr + i);
+      printf("  test_noiseburst KO @ 0x%lx\n\r", (unsigned long)(addr + i));
+      printf("  read 0x%lx instead of 0x%lx\n\r", data, pattern);
       return 4;
     }
 
-    i += sizeof(uint32_t);
+    i++;
   }
 
   return 0;
@@ -799,20 +909,21 @@ uint32_t DDR_Test_NoiseBurst(uint32_t size_in, uint32_t pattern_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Random(uint32_t size_in, uint32_t loop_in,
-                                            uint32_t addr_in)
+uint32_t DDR_Test_Random(unsigned long size_in, unsigned long loop_in,
+                         unsigned long addr_in)
 {
-  uint32_t value = 0;
-  uint32_t data;
-  uint32_t offset;
-  uint32_t addr;
-  uint32_t error = 0U;
+  unsigned long value = 0;
+  unsigned long data;
+  unsigned long offset;
+  uintptr_t *addr = NULL;
+  unsigned long error = 0U;
   uint32_t loop = 0;
   uint32_t nb_loop;
-  uint32_t bufsize;
+  unsigned long bufsize_bytes;
+  unsigned long bufsize_words;
   unsigned int seed;
 
-  if (get_buf_size(size_in, &bufsize, 4 * 1024, 8) != 0)
+  if (get_buf_size(size_in, &bufsize_bytes, 4 * 1024, 8) != 0)
   {
     return 1;
   }
@@ -824,36 +935,38 @@ uint32_t DDR_Test_Random(uint32_t size_in, uint32_t loop_in,
     return 2;
   }
 
-  bufsize /= 2;
+  bufsize_bytes /= 2;
+  bufsize_words = bufsize_bytes/sizeof(unsigned long);
 
   while (error == 0U)
   {
     seed = rand();
     srand(seed);
 
-    for (offset = 0; offset < bufsize; offset += sizeof(uint32_t))
+    for (offset = 0; offset < bufsize_words; offset ++)
     {
-      WRITE_REG(*(volatile uint32_t*)(addr + offset), rand());
+      data = rand();
+      *(addr + offset) = data;
     }
 
-    memcpy((void *)(addr + bufsize), (void *)addr, bufsize);
+    memcpy((void *)((unsigned long)addr + bufsize_bytes), addr, bufsize_bytes);
 
     srand(seed);
 
-    for (offset = 0; offset < (2 * bufsize); offset += sizeof(uint32_t))
+    for (offset = 0; offset < (2 * bufsize_words); offset ++)
     {
-      if (offset == bufsize)
+      if (offset == bufsize_words)
       {
         srand(seed);
       }
 
       value = rand();
-      data = READ_REG(*(volatile uint32_t*)(addr + offset));
+      data = *(addr + offset);
       if (data != value)
       {
         error++;
-        printf("  loop %ld: error @ 0x%lx: 0x%lx expected 0x%lx\n\r",
-               loop, offset, data, value);
+        printf("  loop %d: error @ 0x%lx: 0x%lx expected 0x%lx\n\r",
+               loop, (unsigned long)(addr + offset), data, value);
         break;
       }
     }
@@ -876,53 +989,97 @@ uint32_t DDR_Test_Random(uint32_t size_in, uint32_t loop_in,
 #define DDR_PATTERN_SIZE  8
 
 /* pattern test, optimized loop for read/write pattern (array of 8 u32) */
-static int test_loop(const uint32_t *pattern, uint32_t *address,
-                     const uint32_t bufsize)
+static void test_loop_in(const unsigned long *pattern, unsigned long offset,
+                         unsigned long testsize)
 {
-  int i;
-  int j;
-  uint32_t offset;
-  uint32_t testsize;
-  uint32_t remaining;
+  __asm volatile (
+//                "PUSH {x3-x10}            \n"
+                  "STP x3, x4, [sp, #-16]!  \n"
+                  "STP x5, x6, [sp, #-16]!  \n"
+                  "STP x7, x8, [sp, #-16]!  \n"
+                  "STP x9, x10, [sp, #-16]! \n"
 
-  offset = (uint32_t)address;
+                  "MOV x0, %[pattern]       \n"
+                  "MOV x1, %[offset]        \n"
+                  "MOV x2, %[testsize]      \n"
+
+//                "LDMIA x0!, {x3-x10}      \n"
+                  "LDP x3, x4, [x0], #16    \n"
+                  "LDP x5, x6, [x0], #16    \n"
+                  "LDP x7, x8, [x0], #16    \n"
+                  "LDP x9, x10, [x0], #16   \n"
+
+                  "loop2:                   \n"
+
+//                "STMIA x1!, {x3-x10}      \n"
+                  "STP x3, x4, [x1], #16    \n"
+                  "STP x5, x6, [x1], #16    \n"
+                  "STP x7, x8, [x1], #16    \n"
+                  "STP x9, x10, [x1], #16   \n"
+
+//                "STMIA x1!, {x3-x10}      \n"
+                  "STP x3, x4, [x1], #16    \n"
+                  "STP x5, x6, [x1], #16    \n"
+                  "STP x7, x8, [x1], #16    \n"
+                  "STP x9, x10, [x1], #16   \n"
+
+//                "STMIA x1!, {x3-x10}      \n"
+                  "STP x3, x4, [x1], #16    \n"
+                  "STP x5, x6, [x1], #16    \n"
+                  "STP x7, x8, [x1], #16    \n"
+                  "STP x9, x10, [x1], #16   \n"
+
+//                "STMIA x1!, {x3-x10}      \n"
+                  "STP x3, x4, [x1], #16    \n"
+                  "STP x5, x6, [x1], #16    \n"
+                  "STP x7, x8, [x1], #16    \n"
+                  "STP x9, x10, [x1], #16   \n"
+
+                  "SUBS x2, x2, #256        \n"
+                  "BGE loop2                \n"
+
+//                "POP {x3-x10}             \n"
+                  "LDP x3, x4, [sp], #16    \n"
+                  "LDP x5, x6, [sp], #16    \n"
+                  "LDP x7, x8, [sp], #16    \n"
+                  "LDP x9, x10, [sp], #16   \n"
+                    ::[pattern]  "r" (pattern),
+                      [offset]   "r" (offset),
+                      [testsize] "r" (testsize)
+                    : "x0", "x1", "x2");
+}
+
+static int test_loop(const unsigned long *pattern, uintptr_t *address,
+                     const unsigned long bufsize)
+{
+  unsigned long i;
+  int j;
+  unsigned long offset;
+  unsigned long testsize;
+  unsigned long remaining;
+
+  offset = (unsigned long)address;
   remaining = bufsize;
 
   while (remaining)
   {
     testsize = bufsize > 0x1000000 ? 0x1000000 : bufsize;
 
-    __asm volatile ("PUSH {r3-r10}          \n"
-                    "MOV r0, %[pattern]     \n"
-                    "MOV r1, %[offset]      \n"
-                    "MOV r2, %[testsize]    \n"
-
-                    "LDMIA r0!, {r3-r10}\n"
-
-                    "loop2:\n"
-                    "STMIA r1!, {r3-r10}\n"
-                    "STMIA r1!, {r3-r10}\n"
-                    "STMIA r1!, {r3-r10}\n"
-                    "STMIA r1!, {r3-r10}\n"
-                    "SUBS r2, r2, #128\n"
-                    "BGE loop2\n"
-                    "POP {r3-r10}\n"
-                    ::[pattern]  "r" (pattern),
-                      [offset]   "r" (offset),
-                      [testsize] "r" (testsize)
-                    : "r0", "r1", "r2");
+    test_loop_in(pattern, offset, testsize);
 
     offset += testsize;
     remaining -= testsize;
   }
 
-  for (i = 0; i < bufsize; i += DDR_PATTERN_SIZE * sizeof(uint32_t))
+  offset = 0;
+
+  for (i = 0; i < bufsize / sizeof(unsigned long); i += DDR_PATTERN_SIZE)
   {
-    for (j = 0; j < DDR_PATTERN_SIZE; j++, address++)
+    for (j = 0; j < DDR_PATTERN_SIZE; j++, offset++)
     {
-      if (READ_REG(*(volatile uint32_t*)address) != pattern[j])
+      if (*(address + offset) != pattern[j])
       {
-        printf("  test_freqpattern KO @ 0x%lx\n\r", *address);
+        printf("  test_freqpattern KO @ 0x%lx\n\r", (unsigned long)(address + offset));
         return 1;
       }
     }
@@ -931,44 +1088,44 @@ static int test_loop(const uint32_t *pattern, uint32_t *address,
   return 0;
 }
 
-const uint32_t pattern_div1_x16[DDR_PATTERN_SIZE] = {
-  0x0000FFFF, 0x0000FFFF, 0x0000FFFF, 0x0000FFFF,
-  0x0000FFFF, 0x0000FFFF, 0x0000FFFF, 0x0000FFFF
+const unsigned long pattern_div1_x16[DDR_PATTERN_SIZE] = {
+  0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF,
+  0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF
 };
 
-const uint32_t pattern_div2_x16[DDR_PATTERN_SIZE] = {
-  0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000,
-  0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000000
+const unsigned long pattern_div2_x16[DDR_PATTERN_SIZE] = {
+  0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000,
+  0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000
 };
 
-const uint32_t pattern_div4_x16[DDR_PATTERN_SIZE] = {
-  0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000,
-  0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000
+const unsigned long pattern_div4_x16[DDR_PATTERN_SIZE] = {
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x0000000000000000,
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000, 0x0000000000000000
 };
 
-const uint32_t pattern_div4_x32[DDR_PATTERN_SIZE] = {
-  0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-  0x00000000, 0x00000000, 0x00000000, 0x00000000
+const unsigned long pattern_div4_x32[DDR_PATTERN_SIZE] = {
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+  0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000
 };
 
-const uint32_t pattern_mostly_zero_x16[DDR_PATTERN_SIZE] = {
-  0x00000000, 0x00000000, 0x00000000, 0x0000FFFF,
-  0x00000000, 0x00000000, 0x00000000, 0x00000000
+const unsigned long pattern_mostly_zero_x16[DDR_PATTERN_SIZE] = {
+  0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000FFFF0000FFFF,
+  0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000
 };
 
-const uint32_t pattern_mostly_zero_x32[DDR_PATTERN_SIZE] = {
-  0x00000000, 0x00000000, 0x00000000, 0xFFFFFFFF,
-  0x00000000, 0x00000000, 0x00000000, 0x00000000
+const unsigned long pattern_mostly_zero_x32[DDR_PATTERN_SIZE] = {
+  0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0xFFFFFFFFFFFFFFFF,
+  0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000
 };
 
-const uint32_t pattern_mostly_one_x16[DDR_PATTERN_SIZE] = {
-  0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x0000FFFF,
-  0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+const unsigned long pattern_mostly_one_x16[DDR_PATTERN_SIZE] = {
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000FFFF0000FFFF,
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
 };
 
-const uint32_t pattern_mostly_one_x32[DDR_PATTERN_SIZE] = {
-  0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000,
-  0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+const unsigned long pattern_mostly_one_x32[DDR_PATTERN_SIZE] = {
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x0000000000000000,
+  0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
 };
 
 #define DDR_NB_PATTERN                      5
@@ -997,17 +1154,17 @@ const uint32_t pattern_mostly_one_x32[DDR_PATTERN_SIZE] = {
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_FrequencySelectivePattern(uint32_t size,
-                                                uint32_t addr_in)
+uint32_t DDR_Test_FrequencySelectivePattern(unsigned long size,
+                                            unsigned long addr_in)
 {
-  const uint32_t * const patterns_x16[DDR_NB_PATTERN] = {
+  const unsigned long * const patterns_x16[DDR_NB_PATTERN] = {
     pattern_div1_x16,
     pattern_div2_x16,
     pattern_div4_x16,
     pattern_mostly_zero_x16,
     pattern_mostly_one_x16,
   };
-  const uint32_t * const patterns_x32[DDR_NB_PATTERN] = {
+  const unsigned long * const patterns_x32[DDR_NB_PATTERN] = {
     pattern_div2_x16,
     pattern_div4_x16,
     pattern_div4_x32,
@@ -1018,9 +1175,9 @@ uint32_t DDR_Test_FrequencySelectivePattern(uint32_t size,
   int i;
   int bus_width;
   int ret = 0;
-  const uint32_t **patterns;
-  uint32_t bufsize;
-  uint32_t addr;
+  const unsigned long **patterns;
+  unsigned long bufsize;
+  uintptr_t *addr = NULL;
 
   if (get_buf_size(size, &bufsize, 4 * 1024, 128) != 0)
   {
@@ -1043,11 +1200,11 @@ uint32_t DDR_Test_FrequencySelectivePattern(uint32_t size,
       break;
   }
 
-  patterns = (const uint32_t **)(bus_width == 16 ? patterns_x16 : patterns_x32);
+  patterns = (const unsigned long **)(bus_width == 16 ? patterns_x16 : patterns_x32);
 
   for (i = 0; i < DDR_NB_PATTERN; i++)
   {
-    ret = test_loop(patterns[i], (uint32_t *)addr, bufsize);
+    ret = test_loop(patterns[i], addr, bufsize);
     if (ret != 0)
     {
       printf("  test_freqpattern KO\n\r");
@@ -1059,28 +1216,31 @@ uint32_t DDR_Test_FrequencySelectivePattern(uint32_t size,
 }
 
 /* pattern test with size, loop for write pattern */
-static int test_loop_size(const uint32_t *pattern, uint32_t size,
-                          uint32_t *address, const uint32_t bufsize)
+static int test_loop_size(const unsigned long *pattern, unsigned long size,
+                          uintptr_t *address, const unsigned long bufsize,
+                          __attribute__((unused))uint32_t loop_nb,
+                          __attribute__((unused))uint32_t loop)
 {
-  int i, j;
-  uint32_t *p = address;
+  unsigned long i, j;
+  uintptr_t *addr = (uintptr_t *)address;
 
-  for (i = 0; i < bufsize; i += (size * sizeof(uint32_t)))
+  for (i = 0; i < bufsize / sizeof(unsigned long); i += size)
   {
-    for (j = 0; j < size ; j++, p++)
+    for (j = 0; j < size ; j++, addr++)
     {
-      *p = pattern[j];
+      *addr = pattern[j];
     }
+
   }
 
-  p = address;
-  for (i = 0; i < bufsize; i += size * sizeof(uint32_t))
+  addr = address;
+  for (i = 0; i < bufsize / sizeof(unsigned long); i += size)
   {
-    for (j = 0; j < size; j++, p++)
+    for (j = 0; j < size; j++, addr++)
     {
-      if (READ_REG(*(volatile uint32_t*)p) != pattern[j])
+      if (*addr != pattern[j])
       {
-        printf("  test KO @ 0x%ln\n\r", p);
+        printf("  test KO @ 0x%lx\n\r", (unsigned long)addr);
         return 1;
       }
     }
@@ -1109,15 +1269,15 @@ static int test_loop_size(const uint32_t *pattern, uint32_t size,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_BlockSequential(uint32_t size, uint32_t loop_in,
-                                      uint32_t addr_in)
+uint32_t DDR_Test_BlockSequential(unsigned long size, unsigned long loop_in,
+                                  unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t value;
-  int i;
+  uintptr_t *addr = NULL;
+  unsigned long value;
+  unsigned long i;
   int ret;
 
   if (get_buf_size(size, &bufsize, 4 * 1024, 4) != 0)
@@ -1136,8 +1296,8 @@ uint32_t DDR_Test_BlockSequential(uint32_t size, uint32_t loop_in,
   {
     for (i = 0; i < 256; i++)
     {
-      value = i | i << 8 | i << 16 | i << 24;
-      ret = test_loop_size(&value, 1, (uint32_t *)addr, bufsize);
+      value = i | i << 8 | i << 16 | i << 24 | i << 32 | i << 40 | i << 48 | i << 56;
+      ret = test_loop_size(&value, 1, addr, bufsize, 256, i);
       if (ret != 0)
       {
         printf("  test_blockseq KO\n\r");
@@ -1174,16 +1334,19 @@ uint32_t DDR_Test_BlockSequential(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Checkerboard(uint32_t size, uint32_t loop_in,
-                                   uint32_t addr_in)
+uint32_t DDR_Test_Checkerboard(unsigned long size, unsigned long loop_in,
+                               unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t checkboard[2] = {0x55555555, 0xAAAAAAAA};
+  uintptr_t *addr = NULL;
+  unsigned long checkboard[2];
   int i;
   int ret;
+
+  checkboard[0] = 0x5555555555555555;
+  checkboard[1] = 0xAAAAAAAAAAAAAAAA;
 
   if (get_buf_size(size, &bufsize, 4 * 1024, 8) != 0)
   {
@@ -1201,7 +1364,7 @@ uint32_t DDR_Test_Checkerboard(uint32_t size, uint32_t loop_in,
   {
     for (i = 0; i < 2; i++)
     {
-      ret = test_loop_size(checkboard, 2, (uint32_t *)addr, bufsize);
+      ret = test_loop_size(checkboard, 2, addr, bufsize, 2, i);
       if (ret != 0)
       {
         printf("  test_checkboard KO\n\r");
@@ -1242,14 +1405,14 @@ uint32_t DDR_Test_Checkerboard(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_BitSpread(uint32_t size, uint32_t loop_in,
-                                uint32_t addr_in)
+uint32_t DDR_Test_BitSpread(unsigned long size, unsigned long loop_in,
+                            unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t bitspread[4];
+  uintptr_t *addr = NULL;
+  unsigned long bitspread[4];
   int i;
   int j;
   int ret;
@@ -1268,7 +1431,7 @@ uint32_t DDR_Test_BitSpread(uint32_t size, uint32_t loop_in,
 
   while (1)
   {
-    for (i = 1; i < 32; i++)
+    for (i = 1; i < (int)(sizeof(unsigned long) * 8); i++)
     {
       for (j = 0; j < i; j++)
       {
@@ -1285,7 +1448,7 @@ uint32_t DDR_Test_BitSpread(uint32_t size, uint32_t loop_in,
         bitspread[2] = ~bitspread[0];
         bitspread[3] = ~bitspread[0];
 
-        ret = test_loop_size(bitspread, 4, (uint32_t *)addr, bufsize);
+        ret = test_loop_size(bitspread, 4, addr, bufsize, 32, i);
         if (ret != 0)
         {
           printf("  test_bitspread KO\n\r");
@@ -1322,14 +1485,14 @@ uint32_t DDR_Test_BitSpread(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_BitFlip(uint32_t size, uint32_t loop_in,
-                              uint32_t addr_in)
+uint32_t DDR_Test_BitFlip(unsigned long size, unsigned long loop_in,
+                          unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t bitflip[4];
+  uintptr_t *addr = NULL;
+  unsigned long bitflip[4];
   int i;
   int ret;
 
@@ -1347,14 +1510,14 @@ uint32_t DDR_Test_BitFlip(uint32_t size, uint32_t loop_in,
 
   while (1)
   {
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < (int)(sizeof(unsigned long) * 8); i++)
     {
       bitflip[0] = 1 << i;
       bitflip[1] = bitflip[0];
       bitflip[2] = ~bitflip[0];
       bitflip[3] = bitflip[2];
 
-      ret = test_loop_size(bitflip, 4, (uint32_t *)addr, bufsize);
+      ret = test_loop_size(bitflip, 4, addr, bufsize, 32, i);
       if (ret != 0)
       {
         printf("  test_bitflip KO\n\r");
@@ -1390,16 +1553,17 @@ uint32_t DDR_Test_BitFlip(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_WalkingZeroes(uint32_t size, uint32_t loop_in,
-                                    uint32_t addr_in)
+uint32_t DDR_Test_WalkingZeroes(unsigned long size, unsigned long loop_in,
+                                unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t value;
+  uintptr_t *addr = NULL;
+  unsigned long value;
   int i;
   int ret;
+  int depth;
 
   if (get_buf_size(size, &bufsize, 4 * 1024, 4) != 0)
   {
@@ -1413,20 +1577,22 @@ uint32_t DDR_Test_WalkingZeroes(uint32_t size, uint32_t loop_in,
     return 2;
   }
 
+  depth = sizeof(unsigned long) * 8;
+
   while (1)
   {
-    for (i = 0; i < 64; i++)
+    for (i = 0; i < depth * 2 ; i++)
     {
-      if (i < 32)
+      if (i < depth)
       {
         value = 1 << i;
       }
       else
       {
-        value = 1 << (63 - i);
+        value = 1 << ((depth * 2) - 1 - i);
       }
 
-      ret = test_loop_size(&value, 1, (uint32_t *)addr, bufsize);
+      ret = test_loop_size(&value, 1, addr, bufsize, (depth * 2) -1, i);
       if (ret != 0)
       {
         printf("  test_walkbit0 KO\n\r");
@@ -1462,16 +1628,17 @@ uint32_t DDR_Test_WalkingZeroes(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_WalkingOnes(uint32_t size, uint32_t loop_in,
-                                  uint32_t addr_in)
+uint32_t DDR_Test_WalkingOnes(unsigned long size, unsigned long loop_in,
+                              unsigned long addr_in)
 {
-  uint32_t bufsize;
+  unsigned long bufsize;
   uint32_t nb_loop;
   uint32_t loop = 0;
-  uint32_t addr;
-  uint32_t value;
+  uintptr_t *addr = NULL;
+  unsigned long value;
   int i;
   int ret;
+  int depth;
 
   if (get_buf_size(size, &bufsize, 4 * 1024, 4) != 0)
   {
@@ -1485,20 +1652,22 @@ uint32_t DDR_Test_WalkingOnes(uint32_t size, uint32_t loop_in,
     return 2;
   }
 
+  depth = sizeof(unsigned long) * 8;
+
   while (1)
   {
-    for (i = 0; i < 64; i++)
+    for (i = 0; i < depth * 2; i++)
     {
-      if (i < 32)
+      if (i < depth)
       {
         value = ~(1 << i);
       }
       else
       {
-        value = ~(1 << (63 - i));
+        value = ~(1 << ((depth * 2) - 1 - i));
       }
 
-      ret = test_loop_size(&value, 1, (uint32_t *)addr, bufsize);
+      ret = test_loop_size(&value, 1, addr, bufsize, (depth * 2) - 1, i);
       if (ret != 0)
       {
         printf("  test_walkbit1 KO\n\r");
@@ -1535,31 +1704,32 @@ uint32_t DDR_Test_WalkingOnes(uint32_t size, uint32_t loop_in,
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Infinite_write(uint32_t pattern_in, uint32_t addr_in)
+uint32_t DDR_Test_Infinite_write(unsigned long pattern_in, unsigned long addr_in)
 {
-  uint32_t addr;
-  uint32_t data;
+  uintptr_t *addr = NULL;
+  unsigned long data;
   uint32_t loop = 0;
   uint32_t nb_loop = 0xFFFFFFFFU;
   int i, size = 1024 * 1024;
   bool random = false;
   volatile uint32_t go_loop = 1U;
+  unsigned long dflt_pattern = 0xA5A5AA55AAAA5555;
 
   if (get_addr(addr_in, &addr) != 0)
   {
     return 1;
   }
 
-  get_pattern(pattern_in, &data, 0xA5A5AA55);
+  get_pattern(pattern_in, &data, dflt_pattern);
 
-  if (addr == 0xC8888888)
+  if ((unsigned long)addr == 0xC8888888)
   {
     printf("running random\n\r");
     random = true;
   }
   else
   {
-    printf("running at 0x%lx with pattern 0x%lx\n\r", addr, data);
+    printf("running at 0x%lx with pattern 0x%lx\n\r", (unsigned long)addr, data);
   }
 
   while (go_loop != 0U)
@@ -1568,11 +1738,11 @@ uint32_t DDR_Test_Infinite_write(uint32_t pattern_in, uint32_t addr_in)
     {
       if (random)
       {
-        addr = (uint32_t)((rand() & (DDR_MEM_SIZE - 1) & ~0x3));
+        addr = (uintptr_t *)(unsigned long)((rand() & (DDR_MEM_SIZE - 1) & ~0x3));
         data = rand();
       }
 
-      WRITE_REG(*(volatile uint32_t*)addr, data);
+      *addr = data;
     }
 
     if (test_loop_end(&loop, nb_loop))
@@ -1603,32 +1773,33 @@ uint32_t DDR_Test_Infinite_write(uint32_t pattern_in, uint32_t addr_in)
 *  Value different from 0: Test failed
 *  None(0xFF): if the result is deduced by the user: waveform, event...
 */
-uint32_t DDR_Test_Infinite_read(uint32_t pattern_in, uint32_t addr_in)
+uint32_t DDR_Test_Infinite_read(unsigned long pattern_in, unsigned long addr_in)
 {
-  uint32_t addr;
-  uint32_t data;
+  uintptr_t *addr = NULL;
+  unsigned long data;
   uint32_t loop = 0;
   uint32_t nb_loop = 0xFFFFFFFFU;
   int i, size = 1024 * 1024;
   bool random = false;
   volatile uint32_t go_loop = 1U;
+  unsigned long dflt_pattern = 0xA5A5AA55AAAA5555;
 
   if (get_addr(addr_in, &addr) != 0)
   {
     return 1;
   }
 
-  get_pattern(pattern_in, &data, 0xA5A5AA55);
+  get_pattern(pattern_in, &data, dflt_pattern);
 
-  if (addr == 0xC8888888)
+  if ((unsigned long)addr == 0xC8888888)
   {
     printf("running random\n\r");
     random = true;
   }
   else
   {
-    printf("running at 0x%lx with pattern 0x%lx\n\r", addr, data);
-    WRITE_REG(*(volatile uint32_t*)addr, data);
+    printf("running at 0x%lx with pattern 0x%lx\n\r", (unsigned long)addr, data);
+    *addr = data;
   }
 
   while (go_loop != 0U)
@@ -1636,10 +1807,10 @@ uint32_t DDR_Test_Infinite_read(uint32_t pattern_in, uint32_t addr_in)
     for (i = 0; i < size; i++)
     {
       if (random)
-        addr = (uint32_t)((rand() & (DDR_MEM_SIZE - 1) & ~0x3));
+        addr = (uintptr_t *)(unsigned long)((rand() & (DDR_MEM_SIZE - 1) & ~0x3));
 
-      READ_REG(*(volatile uint32_t*)addr);
-      printf("data @ address 0x%lx = 0x%lx \n\r", addr, data);
+      data = *addr;
+      printf("data @ address 0x%lx = 0x%lx \n\r", (unsigned long)addr, data);
     }
 
     if (test_loop_end(&loop, nb_loop))

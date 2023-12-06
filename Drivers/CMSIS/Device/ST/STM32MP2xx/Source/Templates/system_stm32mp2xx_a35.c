@@ -645,6 +645,24 @@ void SystemInit(void)
   __FPU_Enable();
 #endif
 
+#ifdef MMU_USE
+  /* Create Translation Table */
+#ifdef LPAE_USE
+  MMU_CreateTranslationTable_LPAE();
+#else /* LPAE_USE */
+  MMU_CreateTranslationTable();
+#endif /* LPAE_USE */
+
+  /* Enable MMU */
+  MMU_Enable();
+#endif /* MMU_USE */
+
+#ifdef CACHE_USE
+  /* Enable Caches */
+  L1C_EnableCaches();
+  L1C_EnableBTAC();
+#endif /* CACHE_USE */
+
 #if (__GIC_PRESENT == 1)
   uint32_t i;
 
@@ -803,7 +821,7 @@ static uint32_t ComputePLLClockFreq(PLLInitTypeDef *pll)
   uint32_t source_freq;
   uint64_t pll_output;
 
-#if defined(USE_STM32MP257CXX_FPGA)
+#if defined(USE_STM32MP257CXX_FPGA) || defined (USE_STM32MP235FXX_FPGA)
   source_freq = 32000000UL;
 #else /* USE_STM32MP257CXX_FPGA */
   switch (pll->PLLSource)
@@ -821,7 +839,7 @@ static uint32_t ComputePLLClockFreq(PLLInitTypeDef *pll)
       source_freq = 0;
       break;
   }
-#endif /* else USE_STM32MP257CXX_FPGA */
+#endif /* else USE_STM32MP257CXX_FPGA || USE_STM32MP235FXX_FPGA*/
 
   /* Compute PLL frequency from PLL parameters according to fractional mode selection */
   /* Note : keep maximum computing precision by doubling integer resolution */

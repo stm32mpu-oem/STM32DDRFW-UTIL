@@ -78,7 +78,9 @@ typedef struct
   int32_t  (*ReadReg           )(STPMIC2_Object_t*, uint8_t, uint8_t*);
   int32_t  (*WriteReg          )(STPMIC2_Object_t*, uint8_t, uint8_t);
   int32_t  (*UpdateReg         )(STPMIC2_Object_t*, uint8_t, uint8_t);
+#if defined (STPMIC2_DEBUG)
   int32_t  (*DumpRegs          )(STPMIC2_Object_t*);
+#endif
 }STPMIC2_Drv_t;
 
 typedef struct
@@ -130,6 +132,14 @@ typedef enum {
 typedef enum {
 	STPMIC2_IT_PONKEY_F=IT_PONKEY_F,
 	STPMIC2_IT_PONKEY_R,
+	STPMIC2_IT_WKP_FA,
+	STPMIC2_IT_WKP_RI,
+	STPMIC2_IT_VINLOW_FA,
+	STPMIC2_IT_VINLOW_RI,
+	STPMIC2_IT_VBUS_FA,
+	STPMIC2_IT_VBUS_RI,
+	STPMIC2_IT_THW_FA,
+	STPMIC2_IT_THW_RI,
 	STPMIC2_IT_BUCK1_OCP=IT_BUCK1_OCP,
 	STPMIC2_IT_BUCK2_OCP,
 	STPMIC2_IT_BUCK3_OCP,
@@ -148,6 +158,7 @@ typedef enum {
 	STPMIC2_IT_LDO8_OCP,
 	IRQ_NR,
 } PMIC_IRQn;
+
 
 /**
  * @brief  STPMIC2 Features Parameters

@@ -198,55 +198,55 @@
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
- #define HSE_VALUE             ((uint32_t) 40000000U)      /*!< Value of the External High Speed oscillator in Hz */
+#define HSE_VALUE             ((uint32_t) 40000000U)      /*!< Value of the External High Speed oscillator in Hz */
 
 /**
   * @brief In the following line adjust the External High Speed oscillator (HSE) Startup
   *        Timeout value
   */
- #define HSE_STARTUP_TIMEOUT   ((uint32_t)100U)        /*!< Time out for HSE start up, in ms */
+#define HSE_STARTUP_TIMEOUT   ((uint32_t)100U)        /*!< Time out for HSE start up, in ms */
 
 /**
   * @brief Internal High Speed oscillator (HSI) value.
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSI is used as system clock source, directly or through the PLL).
   */
- #define HSI_VALUE             ((uint32_t) 64000000U)      /*!< Value of the Internal High Speed oscillator in Hz*/
+#define HSI_VALUE             ((uint32_t) 64000000U)      /*!< Value of the Internal High Speed oscillator in Hz*/
 
 /**
   * @brief In the following line adjust the Internal High Speed oscillator (HSI) Startup
   *        Timeout value
   */
- #define HSI_STARTUP_TIMEOUT   ((uint32_t)5000U)       /*!< Time out for HSI start up */
+#define HSI_STARTUP_TIMEOUT   ((uint32_t)5000U)       /*!< Time out for HSI start up */
 
 /**
   * @brief Internal Low Speed oscillator (LSI) value.
   */
- #define LSI_VALUE             ((uint32_t)32000U)      /*!< LSI Typical Value in Hz*/
+#define LSI_VALUE             ((uint32_t)32000U)      /*!< LSI Typical Value in Hz*/
                                                          /* The real value may vary depending on the variations */
                                                          /* in voltage and temperature. */
 /**
   * @brief External Low Speed oscillator (LSE) value.
   */
- #define LSE_VALUE             ((uint32_t)32768U)      /*!< Value of the External Low Speed oscillator in Hz*/
+#define LSE_VALUE             ((uint32_t)32768U)      /*!< Value of the External Low Speed oscillator in Hz*/
 
 /**
   * @brief Time out for LSE start up value in ms.
   */
- #define LSE_STARTUP_TIMEOUT   ((uint32_t)5000U)       /*!< Time out for LSE start up, in ms */
+#define LSE_STARTUP_TIMEOUT   ((uint32_t)5000U)       /*!< Time out for LSE start up, in ms */
 
 /**
   * @brief Internal  oscillator (CSI) default value.
   *        This value is the default CSI value after Reset.
   */
- #define CSI_VALUE             ((uint32_t)4000000U)    /*!< Value of the Internal oscillator in Hz*/
+#define CSI_VALUE             ((uint32_t)4000000U)    /*!< Value of the Internal oscillator in Hz*/
 
 /**
   * @brief External clock source for I2S peripheral
   *        This value is used by the I2S HAL module to compute the I2S clock source
   *        frequency, this source is inserted directly through I2S_CKIN pad.
   */
- #define EXTERNAL_CLOCK_VALUE  ((uint32_t)12288000U)   /*!< Value of the External clock in Hz*/
+#define EXTERNAL_CLOCK_VALUE  ((uint32_t)12288000U)   /*!< Value of the External clock in Hz*/
 
 /* ########################### System Configuration ######################### */
 /* Define here system config values if you have to override default values set in BSP */

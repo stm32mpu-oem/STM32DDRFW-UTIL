@@ -1149,11 +1149,11 @@ __STATIC_INLINE uint32_t LL_RCC_PREDIVxIsReady(uint32_t flexid)
 {
   if (flexid <= 31)
   {
-    return ((READ_BIT(RCC->PREDIVSR1, (1 << flexid)) == (1 << flexid)) ? 1UL : 0UL);
+    return ((READ_BIT(RCC->PREDIVSR1, (1U << flexid)) == (1U << flexid)) ? 1UL : 0UL);
   }
   else
   {
-    return ((READ_BIT(RCC->PREDIVSR2, (1 << (flexid % 32))) == (1 << (flexid % 32))) ? 1UL : 0UL);
+    return ((READ_BIT(RCC->PREDIVSR2, (1U << (flexid % 32))) == (1U << (flexid % 32))) ? 1UL : 0UL);
   }
 }
 
@@ -1177,11 +1177,11 @@ __STATIC_INLINE uint32_t LL_RCC_FINDIVxIsReady(uint32_t flexid)
 {
   if (flexid <= 31)
   {
-    return ((READ_BIT(RCC->FINDIVSR1, (1 << flexid)) == (1 << flexid)) ? 1UL : 0UL);
+    return ((READ_BIT(RCC->FINDIVSR1, (1U << flexid)) == (1U << flexid)) ? 1UL : 0UL);
   }
   else
   {
-    return ((READ_BIT(RCC->FINDIVSR2, (1 << (flexid % 32))) == (1 << (flexid % 32))) ? 1UL : 0UL);
+    return ((READ_BIT(RCC->FINDIVSR2, (1U << (flexid % 32))) == (1U << (flexid % 32))) ? 1UL : 0UL);
   }
 }
 
@@ -14126,7 +14126,7 @@ __STATIC_INLINE uint32_t LL_RCC_IsEnabledLocalResSecure(uint32_t LocalResIndex)
   /* Compute bit position j (LocalResIndex % 32) */
   /* Read bit j in register RCC_SECCFGR[i] */
   /* Return 1 when bit j is set and else 0 */
-  return ((READ_BIT(RCC->SECCFGR[LocalResIndex >> 5], 1 << (LocalResIndex & 0x1F)) == (1 << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
+  return ((READ_BIT(RCC->SECCFGR[LocalResIndex >> 5], 1U << (LocalResIndex & 0x1F)) == (1U << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
 }
 
 /* Manage RCC_PRIVCFGR0 - RCC_PRIVCFGR3 registers */
@@ -14173,7 +14173,7 @@ __STATIC_INLINE uint32_t LL_RCC_IsEnabledLocalResPrivilege(uint32_t LocalResInde
   /* Compute bit position j (LocalResIndex % 32) */
   /* Read bit j in register RCC_PRIVCFGR[i] */
   /* Return 1 when bit j is set and else 0 */
-  return ((READ_BIT(RCC->PRIVCFGR[LocalResIndex >> 5], 1 << (LocalResIndex & 0x1F)) == (1 << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
+  return ((READ_BIT(RCC->PRIVCFGR[LocalResIndex >> 5], 1U << (LocalResIndex & 0x1F)) == (1U << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
 }
 
 /* Manage RCC_RCFGLOCKR0 - RCC_RCFGLOCKR3 registers */
@@ -14207,7 +14207,7 @@ __STATIC_INLINE uint32_t LL_RCC_IsLockedLocalResConfig(uint32_t LocalResIndex)
   /* Compute bit position j (LocalResIndex % 32) */
   /* Read bit j in register RCC_RCFGLOCKR[i] */
   /* Return 1 when bit j is set and else 0 */
-  return ((READ_BIT(RCC->RCFGLOCKR[LocalResIndex >> 5], 1 << (LocalResIndex & 0x1F)) == (1 << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
+  return ((READ_BIT(RCC->RCFGLOCKR[LocalResIndex >> 5], 1U << (LocalResIndex & 0x1F)) == (1U << (LocalResIndex & 0x1F))) ? 1UL : 0UL);
 }
 
 /* Manage RCC_R0CIDCFGR - RCC_R113CIDCFGR registers */

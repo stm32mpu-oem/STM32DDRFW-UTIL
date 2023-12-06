@@ -1469,7 +1469,7 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_IT(USART_HandleTypeDef *husart, cons
 HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint16_t Size)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  const uint32_t *tmp;
+  const uintptr_t *tmp;
   uint16_t nbByte = Size;
 
   if (husart->State == HAL_USART_STATE_READY)
@@ -1507,7 +1507,7 @@ HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, const uint
         nbByte = Size * 2U;
       }
 
-      tmp = (const uint32_t *)&pTxData;
+      tmp = (const uintptr_t *)&pTxData;
 
       /* Check linked list mode */
       if ((husart->hdmatx->Mode & DMA_LINKEDLIST) == DMA_LINKEDLIST)
@@ -1518,11 +1518,11 @@ HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, const uint
           husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CBR1_DEFAULT_OFFSET] = nbByte;
 
           /* Set DMA source address */
-          husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(const uint32_t *)tmp;
+          husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(const unsigned long *)tmp;
 
           /* Set DMA destination address */
           husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] =
-            (uint32_t)&husart->Instance->TDR;
+            (unsigned long)&husart->Instance->TDR;
 
           /* Enable the USART transmit DMA channel */
           status = HAL_DMAEx_List_Start_IT(husart->hdmatx);
@@ -1536,7 +1536,7 @@ HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, const uint
       else
       {
         /* Enable the USART transmit DMA channel */
-        status = HAL_DMA_Start_IT(husart->hdmatx, *(const uint32_t *)tmp, (uint32_t)&husart->Instance->TDR, nbByte);
+        status = HAL_DMA_Start_IT(husart->hdmatx, *(const uintptr_t *)tmp, (unsigned long)&husart->Instance->TDR, nbByte);
       }
     }
 
@@ -1590,7 +1590,7 @@ HAL_StatusTypeDef HAL_USART_Transmit_DMA(USART_HandleTypeDef *husart, const uint
 HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pRxData, uint16_t Size)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  uint32_t *tmp = (uint32_t *)&pRxData;
+  uintptr_t *tmp = (uintptr_t *)&pRxData;
   uint16_t nbByte = Size;
 
   /* Check that a Rx process is not already ongoing */
@@ -1640,10 +1640,10 @@ HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pR
 
           /* Set DMA source address */
           husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] =
-            (uint32_t)&husart->Instance->RDR;
+            (unsigned long)&husart->Instance->RDR;
 
           /* Set DMA destination address */
-          husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = *(uint32_t *)tmp;
+          husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = *(uintptr_t *)tmp;
 
           /* Enable the USART receive DMA channel */
           status = HAL_DMAEx_List_Start_IT(husart->hdmarx);
@@ -1657,7 +1657,7 @@ HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pR
       else
       {
         /* Enable the USART receive DMA channel */
-        status = HAL_DMA_Start_IT(husart->hdmarx, (uint32_t)&husart->Instance->RDR, *(uint32_t *)tmp, nbByte);
+        status = HAL_DMA_Start_IT(husart->hdmarx, (unsigned long)&husart->Instance->RDR, *(uintptr_t *)tmp, nbByte);
       }
     }
 
@@ -1684,11 +1684,11 @@ HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pR
             husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CBR1_DEFAULT_OFFSET] = nbByte;
 
             /* Set DMA source address */
-            husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(uint32_t *)tmp;
+            husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(uintptr_t *)tmp;
 
             /* Set DMA destination address */
             husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] =
-              (uint32_t)&husart->Instance->TDR;
+              (unsigned long)&husart->Instance->TDR;
 
             /* Enable the USART transmit DMA channel */
             status = HAL_DMAEx_List_Start_IT(husart->hdmatx);
@@ -1701,7 +1701,7 @@ HAL_StatusTypeDef HAL_USART_Receive_DMA(USART_HandleTypeDef *husart, uint8_t *pR
         }
         else
         {
-          status = HAL_DMA_Start_IT(husart->hdmatx, *(uint32_t *)tmp, (uint32_t)&husart->Instance->TDR, nbByte);
+          status = HAL_DMA_Start_IT(husart->hdmatx, *(uintptr_t *)tmp, (unsigned long)&husart->Instance->TDR, nbByte);
         }
       }
     }
@@ -1774,7 +1774,7 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
                                                 uint16_t Size)
 {
   HAL_StatusTypeDef status;
-  const uint32_t *tmp;
+  const uintptr_t *tmp;
   uint16_t nbByte = Size;
 
   if (husart->State == HAL_USART_STATE_READY)
@@ -1823,7 +1823,7 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
       }
 
       /* Check linked list mode */
-      tmp = (uint32_t *)&pRxData;
+      tmp = (uintptr_t *)&pRxData;
       if ((husart->hdmarx->Mode & DMA_LINKEDLIST) == DMA_LINKEDLIST)
       {
         if ((husart->hdmarx->LinkedListQueue != NULL) && (husart->hdmarx->LinkedListQueue->Head != NULL))
@@ -1833,10 +1833,10 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
 
           /* Set DMA source address */
           husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] =
-            (uint32_t)&husart->Instance->RDR;
+            (unsigned long)&husart->Instance->RDR;
 
           /* Set DMA destination address */
-          husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = *(const uint32_t *)tmp;
+          husart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = *(const uintptr_t *)tmp;
 
           /* Enable the USART receive DMA channel */
           status = HAL_DMAEx_List_Start_IT(husart->hdmarx);
@@ -1850,13 +1850,13 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
       else
       {
         /* Enable the USART receive DMA channel */
-        status = HAL_DMA_Start_IT(husart->hdmarx, (uint32_t)&husart->Instance->RDR, *(const uint32_t *)tmp, nbByte);
+        status = HAL_DMA_Start_IT(husart->hdmarx, (unsigned long)&husart->Instance->RDR, *(const uintptr_t *)tmp, nbByte);
       }
 
       /* Enable the USART transmit DMA channel */
       if (status == HAL_OK)
       {
-        tmp = (const uint32_t *)&pTxData;
+        tmp = (const uintptr_t *)&pTxData;
 
         /* Check linked list mode */
         if ((husart->hdmatx->Mode & DMA_LINKEDLIST) == DMA_LINKEDLIST)
@@ -1867,11 +1867,11 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
             husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CBR1_DEFAULT_OFFSET] = nbByte;
 
             /* Set DMA source address */
-            husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(const uint32_t *)tmp;
+            husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = *(const uintptr_t *)tmp;
 
             /* Set DMA destination address */
             husart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] =
-              (uint32_t)&husart->Instance->TDR;
+              (unsigned long)&husart->Instance->TDR;
 
             /* Enable the USART transmit DMA channel */
             status = HAL_DMAEx_List_Start_IT(husart->hdmatx);
@@ -1884,7 +1884,7 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart, con
         }
         else
         {
-          status = HAL_DMA_Start_IT(husart->hdmatx, *(const uint32_t *)tmp, (uint32_t)&husart->Instance->TDR, nbByte);
+          status = HAL_DMA_Start_IT(husart->hdmatx, *(const uintptr_t *)tmp, (unsigned long)&husart->Instance->TDR, nbByte);
         }
       }
     }

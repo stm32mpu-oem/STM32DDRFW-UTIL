@@ -27,36 +27,36 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-uint32_t DDR_Test_Databus(uint32_t addr_in);
-uint32_t DDR_Test_DatabusWalk0(uint32_t loop, uint32_t addr);
-uint32_t DDR_Test_DatabusWalk1(uint32_t loop, uint32_t addr);
-uint32_t DDR_Test_AddressBus(uint32_t size, uint32_t addr_in);
-uint32_t DDR_Test_MemDevice(uint32_t size, uint32_t addr_in);
-uint32_t DDR_Test_SimultaneousSwitchingOutput(uint32_t size,
-                                                  uint32_t addr_in);
-uint32_t DDR_Test_Noise(uint32_t pattern_in, uint32_t addr_in);
-uint32_t DDR_Test_NoiseBurst(uint32_t size_in, uint32_t pattern_in,
-                                 uint32_t addr_in);
-uint32_t DDR_Test_Random(uint32_t size, uint32_t loop_in,
-                             uint32_t addr_in);
-uint32_t DDR_Test_FrequencySelectivePattern(uint32_t size,
-                                                uint32_t addr_in);
-uint32_t DDR_Test_BlockSequential(uint32_t size, uint32_t loop_in,
-                                      uint32_t addr_in);
-uint32_t DDR_Test_Checkerboard(uint32_t size, uint32_t loop_in,
-                                   uint32_t addr_in);
-uint32_t DDR_Test_BitSpread(uint32_t size, uint32_t loop_in,
-                                uint32_t addr_in);
-uint32_t DDR_Test_BitFlip(uint32_t size, uint32_t loop_in,
-                              uint32_t addr_in);
-uint32_t DDR_Test_WalkingZeroes(uint32_t size, uint32_t loop_in,
-                                    uint32_t addr_in);
-uint32_t DDR_Test_WalkingOnes(uint32_t size, uint32_t loop_in,
-                                  uint32_t addr_in);
+uint32_t DDR_Test_Databus(unsigned long addr_in);
+uint32_t DDR_Test_DatabusWalk0(unsigned long loop, unsigned long addr);
+uint32_t DDR_Test_DatabusWalk1(unsigned long loop, unsigned long addr);
+uint32_t DDR_Test_AddressBus(unsigned long size, unsigned long addr_in);
+uint32_t DDR_Test_MemDevice(unsigned long size, unsigned long addr_in);
+uint32_t DDR_Test_SimultaneousSwitchingOutput(unsigned long size,
+                                              unsigned long addr_in);
+uint32_t DDR_Test_Noise(unsigned long pattern_in, unsigned long addr_in);
+uint32_t DDR_Test_NoiseBurst(unsigned long size_in, unsigned long pattern_in,
+                             unsigned long addr_in);
+uint32_t DDR_Test_Random(unsigned long size, unsigned long loop_in,
+                         unsigned long addr_in);
+uint32_t DDR_Test_FrequencySelectivePattern(unsigned long size,
+                                            unsigned long addr_in);
+uint32_t DDR_Test_BlockSequential(unsigned long size, unsigned long loop_in,
+                                  unsigned long addr_in);
+uint32_t DDR_Test_Checkerboard(unsigned long size, unsigned long loop_in,
+                               unsigned long addr_in);
+uint32_t DDR_Test_BitSpread(unsigned long size, unsigned long loop_in,
+                            unsigned long addr_in);
+uint32_t DDR_Test_BitFlip(unsigned long size, unsigned long loop_in,
+                          unsigned long addr_in);
+uint32_t DDR_Test_WalkingZeroes(unsigned long size, unsigned long loop_in,
+                                unsigned long addr_in);
+uint32_t DDR_Test_WalkingOnes(unsigned long size, unsigned long loop_in,
+                              unsigned long addr_in);
 #ifdef TEST_INFINITE_ENABLE
-uint32_t DDR_Test_Infinite_write(uint32_t pattern_in,
-                                  uint32_t addr_in);
-uint32_t DDR_Test_Infinite_read(uint32_t pattern_in,
-                                  uint32_t addr_in);
+uint32_t DDR_Test_Infinite_write(unsigned long pattern_in,
+                                 unsigned long addr_in);
+uint32_t DDR_Test_Infinite_read(unsigned long pattern_in,
+                                unsigned long addr_in);
 #endif
 #endif /* __DDR_TESTS_H */

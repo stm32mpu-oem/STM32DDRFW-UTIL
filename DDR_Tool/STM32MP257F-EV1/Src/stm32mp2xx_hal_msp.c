@@ -64,7 +64,7 @@ void HAL_MspDeInit(void)
   * @param huart: UART handle pointer
   * @retval None
   */
-void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+void HAL_UART_MspInit(__attribute__((unused))UART_HandleTypeDef *huart)
 {
 }
 
@@ -76,7 +76,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   * @param huart: UART handle pointer
   * @retval None
   */
-void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+void HAL_UART_MspDeInit(__attribute__((unused))UART_HandleTypeDef *huart)
 {
 }
 
@@ -87,7 +87,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
   *  0: Test passed
   *  Value different from 0: Test failed
   */
-int HAL_DDR_MspInit(ddr_type type)
+int HAL_DDR_MspInit(__attribute__((unused))ddr_type type)
 {
 #if (UTIL_USE_PMIC)
   /* Use PMIC to set and enable DDR power */

@@ -170,7 +170,11 @@
   #define   __I     volatile const       /*!< \brief Defines 'read only' permissions */
 #endif
 #define     __O     volatile             /*!< \brief Defines 'write only' permissions */
-#define     __IO    volatile             /*!< \brief Defines 'read / write' permissions */
+#ifdef __AARCH64__
+  #define     __IO                         /*!< \brief Defines 'read / write' permissions */
+#else
+  #define     __IO    volatile             /*!< \brief Defines 'read / write' permissions */
+#endif
 
 /* following defines should be used for structure members */
 #define     __IM     volatile const      /*!< \brief Defines 'read only' structure member permissions */
@@ -893,7 +897,7 @@ __STATIC_FORCEINLINE void L1C_InvalidateICacheAll(void) {
 * \param [in] va Pointer to data to clear the cache for.
 */
 __STATIC_FORCEINLINE void L1C_CleanDCacheMVA(void *va) {
-  __set_DCCMVAC((uint32_t)va);
+  __set_DCCMVAC((unsigned long)va);
   __DMB();     //ensure the ordering of data cache maintenance operations and their effects
 }
 
@@ -901,7 +905,7 @@ __STATIC_FORCEINLINE void L1C_CleanDCacheMVA(void *va) {
 * \param [in] va Pointer to data to invalidate the cache for.
 */
 __STATIC_FORCEINLINE void L1C_InvalidateDCacheMVA(void *va) {
-  __set_DCIMVAC((uint32_t)va);
+  __set_DCIMVAC((unsigned long)va);
   __DMB();     //ensure the ordering of data cache maintenance operations and their effects
 }
 
@@ -909,7 +913,7 @@ __STATIC_FORCEINLINE void L1C_InvalidateDCacheMVA(void *va) {
 * \param [in] va Pointer to data to invalidate the cache for.
 */
 __STATIC_FORCEINLINE void L1C_CleanInvalidateDCacheMVA(void *va) {
-  __set_DCCIMVAC((uint32_t)va);
+  __set_DCCIMVAC((unsigned long)va);
   __DMB();     //ensure the ordering of data cache maintenance operations and their effects
 }
 
@@ -2574,11 +2578,11 @@ __STATIC_INLINE void MMU_TTPage4k(uint32_t *ttb, uint32_t base_address, uint32_t
 {
 
   uint32_t offset, offset2;
-  uint32_t entry, entry2;
+  unsigned long entry, entry2;
   uint32_t i;
 
   offset = base_address >> 20;
-  entry  = ((int)ttb_l2 & 0xFFFFFC00) | descriptor_l1;
+  entry  = ((unsigned long)ttb_l2 & 0xFFFFFC00) | descriptor_l1;
 
   //4 bytes aligned
   ttb += offset;
@@ -2609,12 +2613,12 @@ __STATIC_INLINE void MMU_TTPage4k(uint32_t *ttb, uint32_t base_address, uint32_t
 __STATIC_INLINE void MMU_TTPage64k(uint32_t *ttb, uint32_t base_address, uint32_t count, uint32_t descriptor_l1, uint32_t *ttb_l2, uint32_t descriptor_l2 )
 {
   uint32_t offset, offset2;
-  uint32_t entry, entry2;
+  unsigned long entry, entry2;
   uint32_t i,j;
 
 
   offset = base_address >> 20;
-  entry  = ((int)ttb_l2 & 0xFFFFFC00) | descriptor_l1;
+  entry  = ((unsigned long)ttb_l2 & 0xFFFFFC00) | descriptor_l1;
 
   //4 bytes aligned
   ttb += offset;

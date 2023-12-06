@@ -20,25 +20,87 @@
 CompilerPath="${1}"
 elf_file_basename="${2}"
 
+# Default parameters
+header_version="2.0"
+cpu_name="8-M.MAIN"
 debug=0
 
-local_script_path=$(dirname $0)
-local_script_path=$(readlink -f ${local_script_path})
-
+# Default memory mapping
 sysram_start_lowbits=0x00000000
 sysram_end_lowbits=0x0003FFFF
 retram_start_lowbits=0x00080000
 retram_end_lowbits=0x0009FFFF
 
+local_script_path=$(dirname $0)
+local_script_path=$(readlink -f ${local_script_path})
+
+while [[ $# -gt 2 ]]; do
+    key="$3"
+
+    case $key in
+        -v|--version)
+        version="$4"
+        shift
+        shift
+        ;;
+        -c|--cpu)
+        cpu="$4"
+        shift
+        shift
+        ;;
+        *) echo "Wrong parameter : $3"
+        exit 1
+        ;;
+  esac
+done
+
+if [ -n "$version" ] ; then
+  case "$version" in
+    2.0)
+      header_version="$version"
+      ;;
+    2.1)
+      header_version="$version"
+      ;;
+    2.2)
+      header_version="$version"
+      ;;
+    *)
+      echo "ERROR header version not supported : $version"
+      exit 1
+	  ;;
+  esac
+fi
+echo "header_version = $header_version"
+
+if [ -n "$cpu" ] ; then
+  case "$cpu" in
+    8-A)
+      cpu_name="$cpu"
+      ;;
+    8-M.MAIN)
+      cpu_name="$cpu"
+      ;;
+    6S-M)
+      cpu_name="$cpu"
+      ;;
+    *)
+      echo "ERROR cpu name not supported : $cpu"
+      exit 1
+	  ;;
+  esac
+fi
+echo "cpu_name = $cpu_name"
+
 case "$(uname -s)" in
   Linux)
     #line for python
     echo Postbuild with python script
-    imgtool="${local_script_path}/Python27/Stm32ImageAddHeader.py"
+    imgtool="${local_script_path}/Python3/Stm32ImageAddHeader.py"
     cmd="python"
     ;;
   *)
-    #line for window executeable
+    #line for window executable
     echo Postbuild with windows executable
     imgtool="${local_script_path}/exe.win-amd64-2.7/Stm32ImageAddHeader.exe"
     cmd=""
@@ -64,7 +126,9 @@ if [ ${debug} -ne 0 ] ; then
   echo "<D> formatted_ep_addr           =<$formatted_ep_addr>"
 fi
 
+if [ "${cpu_name}" == "" ] ; then
 cpu_name=$(${readelf_path} -A ${elf_file_basename}.elf | grep "Tag_CPU_name" | sed -e 's/.*Tag_CPU_name: *\"\([^\"]*\)\"/\1/')
+fi
 
 if [ ${debug} -ne 0 ] ; then
   echo "<D> cpu_name                    =<$cpu_name>"
@@ -149,13 +213,15 @@ if [ "${core}" == "CA35" ] ; then
 fi
 
 if [ "${core}" == "CA35" ] ; then
-  command="${cmd} ${imgtool} ${elf_file_basename}_pb_el3lnch.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${el3_launcher_ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb_el3lnch.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${el3_launcher_ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret=$?
   if [ ${debug} -ne 0 ] ; then
     echo "<D> ret                         =<$ret>"
   fi
-  command="${cmd} ${imgtool} ${elf_file_basename}_pb_no_el3lnch.bin ${elf_file_basename}_no_el3lnch.stm32 -bt ${binary_type} -ep ${ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}.bin ${elf_file_basename}_nopad_no_el3lnch.stm32 -bt ${binary_type} -ep ${ep_addr_for_image} -hv ${header_version} -la 0x0E002600"
+  ${command}
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb_no_el3lnch.bin ${elf_file_basename}_no_el3lnch.stm32 -bt ${binary_type} -ep ${ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret2=$?
   ret=$((ret+ret2))
@@ -164,7 +230,7 @@ if [ "${core}" == "CA35" ] ; then
     echo "<D> ret2                        =<$ret2>"
   fi
 else
-  command="${cmd} ${imgtool} ${elf_file_basename}_pb.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${ep_addr_for_image}"
+  command="${cmd} ${imgtool} ${elf_file_basename}_pb.bin ${elf_file_basename}.stm32 -bt ${binary_type} -ep ${ep_addr_for_image} -hv ${header_version}"
   ${command}
   ret=$?
 fi

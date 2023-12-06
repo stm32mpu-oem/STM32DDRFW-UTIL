@@ -22,7 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32mp257f_eval_bus.h"
 #include "stm32mp257f_eval_errno.h"
-
+#include "res_mgr.h"
 /** @addtogroup BSP
   * @{
   */
@@ -814,11 +814,31 @@ static void I2C_MspInit(I2C_HandleTypeDef *hI2c)
   UNUSED(hI2c);
 
   /*** Configure the GPIOs ***/
-#if !defined(USE_OSTL_RIF_CONFIGURATION_ECOSYSTEM)
+#if (UTIL_USE_PMIC)
+#if (UTIL_PMIC_I2C_PORT == UTIL_I2C1)
+  if(ResMgr_Request(RESMGR_RESOURCE_RIF_RCC, RESMGR_RCC_RESOURCE(96)) == RESMGR_STATUS_ACCESS_OK)
+  {
+	/* Enable SCL GPIO clock */
+	BUS_I2C_SCL_GPIO_CLK_ENABLE();
+  }
+  if(ResMgr_Request(RESMGR_RESOURCE_RIF_RCC, RESMGR_RCC_RESOURCE(98)) == RESMGR_STATUS_ACCESS_OK)
+  {
+	/* Enable SDA GPIO clock */
+	BUS_I2C_SDA_GPIO_CLK_ENABLE();
+  }
+#elif (UTIL_PMIC_I2C_PORT == UTIL_I2C2)
+  /* Enable VddIO4 for Port B */
+  HAL_PWREx_EnableSupply(PWR_PVM_VDDIO4);
   /* Enable SCL GPIO clock */
   BUS_I2C_SCL_GPIO_CLK_ENABLE();
   /* Enable SDA GPIO clock */
   BUS_I2C_SDA_GPIO_CLK_ENABLE();
+#elif (UTIL_PMIC_I2C_PORT == UTIL_I2C7)
+  /* Enable SCL GPIO clock */
+  BUS_I2C_SCL_GPIO_CLK_ENABLE();
+  /* Enable SDA GPIO clock */
+  BUS_I2C_SDA_GPIO_CLK_ENABLE();
+#endif
 #endif
 
   /* Configure I2C Tx as alternate function */

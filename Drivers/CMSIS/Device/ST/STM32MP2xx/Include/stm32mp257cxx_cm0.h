@@ -291,8 +291,9 @@ typedef struct
        uint32_t RESERVED0;       /*!< Reserved                                            Address offset: 0x03C */
   __IO uint32_t DELAYRL;         /*!< GPIO delay low register                             Address offset: 0x040 */
   __IO uint32_t DELAYRH;         /*!< GPIO delay high register                            Address offset: 0x044 */
-  __IO uint32_t PIOCFGRL;        /*!< GPIO PIO control low register                       Address offset: 0x048 */
-  __IO uint32_t PIOCFGRH;        /*!< GPIO delay high register                            Address offset: 0x04C */
+  __IO uint32_t ADVCFGRL;        /*!< GPIO PIO control low register                       Address offset: 0x048 */
+  __IO uint32_t ADVCFGRH;        /*!< GPIO delay high register                            Address offset: 0x04C */
+
   __IO uint32_t CIDCFGR0;        /*!< GPIO CID configuration register for I/O pin 0       Address offset: 0x050 */
   __IO uint32_t SEMCR0;          /*!< GPIO semaphore control register for I/O pin 0       Address offset: 0x054 */
   __IO uint32_t CIDCFGR1;        /*!< GPIO CID configuration register for I/O pin 1       Address offset: 0x058 */
@@ -5164,108 +5165,172 @@ typedef struct
 #define GPIO_LKR_LK15                  GPIO_LKR_LK15_Msk                        /*!< Port x latch keeper for I/O pin y (y= 0 to 15)These bits are written by software to control the I/O latch, to keep PU/PD value even in standby mode.Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
 
 /*****************  Bit definition for GPIO_DELAYRL register  *****************/
-#define GPIO_DELAYRL_DELAY0_Pos        (0U)
-#define GPIO_DELAYRL_DELAY0_Msk        (0xFU << GPIO_DELAYRL_DELAY0_Pos)        /*!< 0x0000000F */
-#define GPIO_DELAYRL_DELAY0            GPIO_DELAYRL_DELAY0_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY1_Pos        (4U)
-#define GPIO_DELAYRL_DELAY1_Msk        (0xFU << GPIO_DELAYRL_DELAY1_Pos)        /*!< 0x000000F0 */
-#define GPIO_DELAYRL_DELAY1            GPIO_DELAYRL_DELAY1_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY2_Pos        (8U)
-#define GPIO_DELAYRL_DELAY2_Msk        (0xFU << GPIO_DELAYRL_DELAY2_Pos)        /*!< 0x00000F00 */
-#define GPIO_DELAYRL_DELAY2            GPIO_DELAYRL_DELAY2_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY3_Pos        (12U)
-#define GPIO_DELAYRL_DELAY3_Msk        (0xFU << GPIO_DELAYRL_DELAY3_Pos)        /*!< 0x0000F000 */
-#define GPIO_DELAYRL_DELAY3            GPIO_DELAYRL_DELAY3_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY4_Pos        (16U)
-#define GPIO_DELAYRL_DELAY4_Msk        (0xFU << GPIO_DELAYRL_DELAY4_Pos)        /*!< 0x000F0000 */
-#define GPIO_DELAYRL_DELAY4            GPIO_DELAYRL_DELAY4_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY5_Pos        (20U)
-#define GPIO_DELAYRL_DELAY5_Msk        (0xFU << GPIO_DELAYRL_DELAY5_Pos)        /*!< 0x00F00000 */
-#define GPIO_DELAYRL_DELAY5            GPIO_DELAYRL_DELAY5_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY6_Pos        (24U)
-#define GPIO_DELAYRL_DELAY6_Msk        (0xFU << GPIO_DELAYRL_DELAY6_Pos)        /*!< 0x0F000000 */
-#define GPIO_DELAYRL_DELAY6            GPIO_DELAYRL_DELAY6_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRL_DELAY7_Pos        (28U)
-#define GPIO_DELAYRL_DELAY7_Msk        (0xFU << GPIO_DELAYRL_DELAY7_Pos)        /*!< 0xF0000000 */
-#define GPIO_DELAYRL_DELAY7            GPIO_DELAYRL_DELAY7_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY0_Pos        (0U)
+#define GPIO_DELAYRL_DLY0_Msk        (0xFU << GPIO_DELAYRL_DLY0_Pos)        /*!< 0x0000000F */
+#define GPIO_DELAYRL_DLY0            GPIO_DELAYRL_DLY0_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY1_Pos        (4U)
+#define GPIO_DELAYRL_DLY1_Msk        (0xFU << GPIO_DELAYRL_DLY1_Pos)        /*!< 0x000000F0 */
+#define GPIO_DELAYRL_DLY1            GPIO_DELAYRL_DLY1_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY2_Pos        (8U)
+#define GPIO_DELAYRL_DLY2_Msk        (0xFU << GPIO_DELAYRL_DLY2_Pos)        /*!< 0x00000F00 */
+#define GPIO_DELAYRL_DLY2            GPIO_DELAYRL_DLY2_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY3_Pos        (12U)
+#define GPIO_DELAYRL_DLY3_Msk        (0xFU << GPIO_DELAYRL_DLY3_Pos)        /*!< 0x0000F000 */
+#define GPIO_DELAYRL_DLY3            GPIO_DELAYRL_DLY3_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY4_Pos        (16U)
+#define GPIO_DELAYRL_DLY4_Msk        (0xFU << GPIO_DELAYRL_DLY4_Pos)        /*!< 0x000F0000 */
+#define GPIO_DELAYRL_DLY4            GPIO_DELAYRL_DLY4_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY5_Pos        (20U)
+#define GPIO_DELAYRL_DLY5_Msk        (0xFU << GPIO_DELAYRL_DLY5_Pos)        /*!< 0x00F00000 */
+#define GPIO_DELAYRL_DLY5            GPIO_DELAYRL_DLY5_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY6_Pos        (24U)
+#define GPIO_DELAYRL_DLY6_Msk        (0xFU << GPIO_DELAYRL_DLY6_Pos)        /*!< 0x0F000000 */
+#define GPIO_DELAYRL_DLY6            GPIO_DELAYRL_DLY6_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRL_DLY7_Pos        (28U)
+#define GPIO_DELAYRL_DLY7_Msk        (0xFU << GPIO_DELAYRL_DLY7_Pos)        /*!< 0xF0000000 */
+#define GPIO_DELAYRL_DLY7            GPIO_DELAYRL_DLY7_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
 
 /*****************  Bit definition for GPIO_DELAYRH register  *****************/
-#define GPIO_DELAYRH_DELAY8_Pos        (0U)
-#define GPIO_DELAYRH_DELAY8_Msk        (0xFU << GPIO_DELAYRH_DELAY8_Pos)        /*!< 0x0000000F */
-#define GPIO_DELAYRH_DELAY8            GPIO_DELAYRH_DELAY8_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY9_Pos        (4U)
-#define GPIO_DELAYRH_DELAY9_Msk        (0xFU << GPIO_DELAYRH_DELAY9_Pos)        /*!< 0x000000F0 */
-#define GPIO_DELAYRH_DELAY9            GPIO_DELAYRH_DELAY9_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY10_Pos       (8U)
-#define GPIO_DELAYRH_DELAY10_Msk       (0xFU << GPIO_DELAYRH_DELAY10_Pos)       /*!< 0x00000F00 */
-#define GPIO_DELAYRH_DELAY10           GPIO_DELAYRH_DELAY10_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY11_Pos       (12U)
-#define GPIO_DELAYRH_DELAY11_Msk       (0xFU << GPIO_DELAYRH_DELAY11_Pos)       /*!< 0x0000F000 */
-#define GPIO_DELAYRH_DELAY11           GPIO_DELAYRH_DELAY11_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY12_Pos       (16U)
-#define GPIO_DELAYRH_DELAY12_Msk       (0xFU << GPIO_DELAYRH_DELAY12_Pos)       /*!< 0x000F0000 */
-#define GPIO_DELAYRH_DELAY12           GPIO_DELAYRH_DELAY12_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY13_Pos       (20U)
-#define GPIO_DELAYRH_DELAY13_Msk       (0xFU << GPIO_DELAYRH_DELAY13_Pos)       /*!< 0x00F00000 */
-#define GPIO_DELAYRH_DELAY13           GPIO_DELAYRH_DELAY13_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY14_Pos       (24U)
-#define GPIO_DELAYRH_DELAY14_Msk       (0xFU << GPIO_DELAYRH_DELAY14_Pos)       /*!< 0x0F000000 */
-#define GPIO_DELAYRH_DELAY14           GPIO_DELAYRH_DELAY14_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_DELAYRH_DELAY15_Pos       (28U)
-#define GPIO_DELAYRH_DELAY15_Msk       (0xFU << GPIO_DELAYRH_DELAY15_Pos)       /*!< 0xF0000000 */
-#define GPIO_DELAYRH_DELAY15           GPIO_DELAYRH_DELAY15_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY8_Pos        (0U)
+#define GPIO_DELAYRH_DLY8_Msk        (0xFU << GPIO_DELAYRH_DLY8_Pos)        /*!< 0x0000000F */
+#define GPIO_DELAYRH_DLY8            GPIO_DELAYRH_DLY8_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY9_Pos        (4U)
+#define GPIO_DELAYRH_DLY9_Msk        (0xFU << GPIO_DELAYRH_DLY9_Pos)        /*!< 0x000000F0 */
+#define GPIO_DELAYRH_DLY9            GPIO_DELAYRH_DLY9_Msk                  /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY10_Pos       (8U)
+#define GPIO_DELAYRH_DLY10_Msk       (0xFU << GPIO_DELAYRH_DLY10_Pos)       /*!< 0x00000F00 */
+#define GPIO_DELAYRH_DLY10           GPIO_DELAYRH_DLY10_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY11_Pos       (12U)
+#define GPIO_DELAYRH_DLY11_Msk       (0xFU << GPIO_DELAYRH_DLY11_Pos)       /*!< 0x0000F000 */
+#define GPIO_DELAYRH_DLY11           GPIO_DELAYRH_DLY11_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY12_Pos       (16U)
+#define GPIO_DELAYRH_DLY12_Msk       (0xFU << GPIO_DELAYRH_DLY12_Pos)       /*!< 0x000F0000 */
+#define GPIO_DELAYRH_DLY12           GPIO_DELAYRH_DLY12_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY13_Pos       (20U)
+#define GPIO_DELAYRH_DLY13_Msk       (0xFU << GPIO_DELAYRH_DLY13_Pos)       /*!< 0x00F00000 */
+#define GPIO_DELAYRH_DLY13           GPIO_DELAYRH_DLY13_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY14_Pos       (24U)
+#define GPIO_DELAYRH_DLY14_Msk       (0xFU << GPIO_DELAYRH_DLY14_Pos)       /*!< 0x0F000000 */
+#define GPIO_DELAYRH_DLY14           GPIO_DELAYRH_DLY14_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_DELAYRH_DLY15_Pos       (28U)
+#define GPIO_DELAYRH_DLY15_Msk       (0xFU << GPIO_DELAYRH_DLY15_Pos)       /*!< 0xF0000000 */
+#define GPIO_DELAYRH_DLY15           GPIO_DELAYRH_DLY15_Msk                 /*!< [3:0]: Port x IO pin y delay setup (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
 
 /****************  Bit definition for GPIO_PIOCFGRL register  *****************/
-#define GPIO_PIOCFGRL_PIOCFG0_Pos      (0U)
-#define GPIO_PIOCFGRL_PIOCFG0_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG0_Pos)      /*!< 0x0000000F */
-#define GPIO_PIOCFGRL_PIOCFG0          GPIO_PIOCFGRL_PIOCFG0_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG1_Pos      (4U)
-#define GPIO_PIOCFGRL_PIOCFG1_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG1_Pos)      /*!< 0x000000F0 */
-#define GPIO_PIOCFGRL_PIOCFG1          GPIO_PIOCFGRL_PIOCFG1_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG2_Pos      (8U)
-#define GPIO_PIOCFGRL_PIOCFG2_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG2_Pos)      /*!< 0x00000F00 */
-#define GPIO_PIOCFGRL_PIOCFG2          GPIO_PIOCFGRL_PIOCFG2_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG3_Pos      (12U)
-#define GPIO_PIOCFGRL_PIOCFG3_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG3_Pos)      /*!< 0x0000F000 */
-#define GPIO_PIOCFGRL_PIOCFG3          GPIO_PIOCFGRL_PIOCFG3_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG4_Pos      (16U)
-#define GPIO_PIOCFGRL_PIOCFG4_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG4_Pos)      /*!< 0x000F0000 */
-#define GPIO_PIOCFGRL_PIOCFG4          GPIO_PIOCFGRL_PIOCFG4_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG5_Pos      (20U)
-#define GPIO_PIOCFGRL_PIOCFG5_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG5_Pos)      /*!< 0x00F00000 */
-#define GPIO_PIOCFGRL_PIOCFG5          GPIO_PIOCFGRL_PIOCFG5_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG6_Pos      (24U)
-#define GPIO_PIOCFGRL_PIOCFG6_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG6_Pos)      /*!< 0x0F000000 */
-#define GPIO_PIOCFGRL_PIOCFG6          GPIO_PIOCFGRL_PIOCFG6_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRL_PIOCFG7_Pos      (28U)
-#define GPIO_PIOCFGRL_PIOCFG7_Msk      (0xFU << GPIO_PIOCFGRL_PIOCFG7_Pos)      /*!< 0xF0000000 */
-#define GPIO_PIOCFGRL_PIOCFG7          GPIO_PIOCFGRL_PIOCFG7_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_0_Pos      	(0U)
+#define GPIO_ADVCFGRL_0_Msk    	  	(0xFU << GPIO_ADVCFGRL_0_Pos)      /*!< 0x0000000F */
+#define GPIO_ADVCFGRL_0          	GPIO_ADVCFGRL_0_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH0      (0x1UL << GPIO_ADVCFGRL_0_Pos)          /*!< 0x00000001 */
+#define GPIO_ADVCFGRL_DE0           (0x2UL << GPIO_ADVCFGRL_0_Pos)          /*!< 0x00000002 */
+#define GPIO_ADVCFGRL_INVCLK0       (0x4UL << GPIO_ADVCFGRL_0_Pos)          /*!< 0x00000004 */
+#define GPIO_ADVCFGRL_RET0          (0x8UL << GPIO_ADVCFGRL_0_Pos)          /*!< 0x00000008 */
+#define GPIO_ADVCFGRL_1_Pos      	(4U)
+#define GPIO_ADVCFGRL_1_Msk      	(0xFU << GPIO_ADVCFGRL_1_Pos)      /*!< 0x000000F0 */
+#define GPIO_ADVCFGRL_1          	GPIO_ADVCFGRL_1_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH1      (0x1UL << GPIO_ADVCFGRL_1_Pos)          /*!< 0x00000010 */
+#define GPIO_ADVCFGRL_DE1           (0x2UL << GPIO_ADVCFGRL_1_Pos)          /*!< 0x00000020 */
+#define GPIO_ADVCFGRL_INVCLK1       (0x4UL << GPIO_ADVCFGRL_1_Pos)          /*!< 0x00000040 */
+#define GPIO_ADVCFGRL_RET1          (0x8UL << GPIO_ADVCFGRL_1_Pos)          /*!< 0x00000080 */
+#define GPIO_ADVCFGRL_2_Pos      	(8U)
+#define GPIO_ADVCFGRL_2_Msk      	(0xFU << GPIO_ADVCFGRL_2_Pos)      /*!< 0x00000F00 */
+#define GPIO_ADVCFGRL_2          	GPIO_ADVCFGRL_2_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH2      (0x1UL << GPIO_ADVCFGRL_2_Pos)          /*!< 0x00000100 */
+#define GPIO_ADVCFGRL_DE2           (0x2UL << GPIO_ADVCFGRL_2_Pos)          /*!< 0x00000200 */
+#define GPIO_ADVCFGRL_INVCLK2       (0x4UL << GPIO_ADVCFGRL_2_Pos)          /*!< 0x00000400 */
+#define GPIO_ADVCFGRL_RET2          (0x8UL << GPIO_ADVCFGRL_2_Pos)          /*!< 0x00000800 */
+#define GPIO_ADVCFGRL_3_Pos      	(12U)
+#define GPIO_ADVCFGRL_3_Msk      	(0xFU << GPIO_ADVCFGRL_3_Pos)      /*!< 0x0000F000 */
+#define GPIO_ADVCFGRL_3          	GPIO_ADVCFGRL_3_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH3      (0x1UL << GPIO_ADVCFGRL_3_Pos)          /*!< 0x00001000 */
+#define GPIO_ADVCFGRL_DE3           (0x2UL << GPIO_ADVCFGRL_3_Pos)          /*!< 0x00002000 */
+#define GPIO_ADVCFGRL_INVCLK3       (0x4UL << GPIO_ADVCFGRL_3_Pos)          /*!< 0x00004000 */
+#define GPIO_ADVCFGRL_RET3          (0x8UL << GPIO_ADVCFGRL_3_Pos)          /*!< 0x00008000 */
+#define GPIO_ADVCFGRL_4_Pos      	(16U)
+#define GPIO_ADVCFGRL_4_Msk      	(0xFU << GPIO_ADVCFGRL_4_Pos)      /*!< 0x000F0000 */
+#define GPIO_ADVCFGRL_4          	GPIO_ADVCFGRL_4_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH4      (0x1UL << GPIO_ADVCFGRL_4_Pos)          /*!< 0x00010000 */
+#define GPIO_ADVCFGRL_DE4           (0x2UL << GPIO_ADVCFGRL_4_Pos)          /*!< 0x00020000 */
+#define GPIO_ADVCFGRL_INVCLK4       (0x4UL << GPIO_ADVCFGRL_4_Pos)          /*!< 0x00040000 */
+#define GPIO_ADVCFGRL_RET4          (0x8UL << GPIO_ADVCFGRL_4_Pos)          /*!< 0x00080000 */
+#define GPIO_ADVCFGRL_5_Pos      	(20U)
+#define GPIO_ADVCFGRL_5_Msk      	(0xFU << GPIO_ADVCFGRL_5_Pos)      /*!< 0x00F00000 */
+#define GPIO_ADVCFGRL_5          	GPIO_ADVCFGRL_5_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH5      (0x1UL << GPIO_ADVCFGRL_5_Pos)          /*!< 0x00100000 */
+#define GPIO_ADVCFGRL_DE5           (0x2UL << GPIO_ADVCFGRL_5_Pos)          /*!< 0x00200000 */
+#define GPIO_ADVCFGRL_INVCLK5       (0x4UL << GPIO_ADVCFGRL_5_Pos)          /*!< 0x00400000 */
+#define GPIO_ADVCFGRL_RET5          (0x8UL << GPIO_ADVCFGRL_5_Pos)          /*!< 0x00800000 */
+#define GPIO_ADVCFGRL_6_Pos      	(24U)
+#define GPIO_ADVCFGRL_6_Msk      	(0xFU << GPIO_ADVCFGRL_6_Pos)      /*!< 0x0F000000 */
+#define GPIO_ADVCFGRL_6          	GPIO_ADVCFGRL_6_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH6      (0x1UL << GPIO_ADVCFGRL_6_Pos)          /*!< 0x01000000 */
+#define GPIO_ADVCFGRL_DE6           (0x2UL << GPIO_ADVCFGRL_6_Pos)          /*!< 0x02000000 */
+#define GPIO_ADVCFGRL_INVCLK6       (0x4UL << GPIO_ADVCFGRL_6_Pos)          /*!< 0x04000000 */
+#define GPIO_ADVCFGRL_RET6          (0x8UL << GPIO_ADVCFGRL_6_Pos)          /*!< 0x08000000 */
+#define GPIO_ADVCFGRL_7_Pos      	(28U)
+#define GPIO_ADVCFGRL_7_Msk      	(0xFU << GPIO_ADVCFGRL_7_Pos)      /*!< 0xF0000000 */
+#define GPIO_ADVCFGRL_7          	GPIO_ADVCFGRL_7_Msk                /*!< [3:0]: Port x IO pin configuration (y = 0 to 7)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRL_DLYPATH7      (0x1UL << GPIO_ADVCFGRL_7_Pos)          /*!< 0x10000000 */
+#define GPIO_ADVCFGRL_DE7           (0x2UL << GPIO_ADVCFGRL_7_Pos)          /*!< 0x20000000 */
+#define GPIO_ADVCFGRL_INVCLK7       (0x4UL << GPIO_ADVCFGRL_7_Pos)          /*!< 0x40000000 */
+#define GPIO_ADVCFGRL_RET7          (0x8UL << GPIO_ADVCFGRL_7_Pos)          /*!< 0x80000000 */
 
 /****************  Bit definition for GPIO_PIOCFGRH register  *****************/
-#define GPIO_PIOCFGRH_PIOCFG8_Pos      (0U)
-#define GPIO_PIOCFGRH_PIOCFG8_Msk      (0xFU << GPIO_PIOCFGRH_PIOCFG8_Pos)      /*!< 0x0000000F */
-#define GPIO_PIOCFGRH_PIOCFG8          GPIO_PIOCFGRH_PIOCFG8_Msk                /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG9_Pos      (4U)
-#define GPIO_PIOCFGRH_PIOCFG9_Msk      (0xFU << GPIO_PIOCFGRH_PIOCFG9_Pos)      /*!< 0x000000F0 */
-#define GPIO_PIOCFGRH_PIOCFG9          GPIO_PIOCFGRH_PIOCFG9_Msk                /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG10_Pos     (8U)
-#define GPIO_PIOCFGRH_PIOCFG10_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG10_Pos)     /*!< 0x00000F00 */
-#define GPIO_PIOCFGRH_PIOCFG10         GPIO_PIOCFGRH_PIOCFG10_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG11_Pos     (12U)
-#define GPIO_PIOCFGRH_PIOCFG11_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG11_Pos)     /*!< 0x0000F000 */
-#define GPIO_PIOCFGRH_PIOCFG11         GPIO_PIOCFGRH_PIOCFG11_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG12_Pos     (16U)
-#define GPIO_PIOCFGRH_PIOCFG12_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG12_Pos)     /*!< 0x000F0000 */
-#define GPIO_PIOCFGRH_PIOCFG12         GPIO_PIOCFGRH_PIOCFG12_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG13_Pos     (20U)
-#define GPIO_PIOCFGRH_PIOCFG13_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG13_Pos)     /*!< 0x00F00000 */
-#define GPIO_PIOCFGRH_PIOCFG13         GPIO_PIOCFGRH_PIOCFG13_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG14_Pos     (24U)
-#define GPIO_PIOCFGRH_PIOCFG14_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG14_Pos)     /*!< 0x0F000000 */
-#define GPIO_PIOCFGRH_PIOCFG14         GPIO_PIOCFGRH_PIOCFG14_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
-#define GPIO_PIOCFGRH_PIOCFG15_Pos     (28U)
-#define GPIO_PIOCFGRH_PIOCFG15_Msk     (0xFU << GPIO_PIOCFGRH_PIOCFG15_Pos)     /*!< 0xF0000000 */
-#define GPIO_PIOCFGRH_PIOCFG15         GPIO_PIOCFGRH_PIOCFG15_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_8_Pos      	(0U)
+#define GPIO_ADVCFGRH_8_Msk      	(0xFU << GPIO_ADVCFGRH_8_Pos)      /*!< 0x0000000F */
+#define GPIO_ADVCFGRH_8          	GPIO_ADVCFGRH_8_Msk                /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH8      (0x1UL << GPIO_ADVCFGRH_8_Pos)          /*!< 0x00000001 */
+#define GPIO_ADVCFGRH_DE8           (0x2UL << GPIO_ADVCFGRH_8_Pos)          /*!< 0x00000002 */
+#define GPIO_ADVCFGRH_INVCLK8       (0x4UL << GPIO_ADVCFGRH_8_Pos)          /*!< 0x00000004 */
+#define GPIO_ADVCFGRH_RET8          (0x8UL << GPIO_ADVCFGRH_8_Pos)          /*!< 0x00000008 */
+#define GPIO_ADVCFGRH_9_Pos      	(4U)
+#define GPIO_ADVCFGRH_9_Msk      	(0xFU << GPIO_ADVCFGRH_9_Pos)      /*!< 0x000000F0 */
+#define GPIO_ADVCFGRH_9          	GPIO_ADVCFGRH_9_Msk                /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH9      (0x1UL << GPIO_ADVCFGRH_9_Pos)          /*!< 0x00000010 */
+#define GPIO_ADVCFGRH_DE9           (0x2UL << GPIO_ADVCFGRH_9_Pos)          /*!< 0x00000020 */
+#define GPIO_ADVCFGRH_INVCLK9       (0x4UL << GPIO_ADVCFGRH_9_Pos)          /*!< 0x00000040 */
+#define GPIO_ADVCFGRH_RET9          (0x8UL << GPIO_ADVCFGRH_9_Pos)          /*!< 0x00000080 */
+#define GPIO_ADVCFGRH_10_Pos     	(8U)
+#define GPIO_ADVCFGRH_10_Msk     	(0xFU << GPIO_ADVCFGRH_10_Pos)     /*!< 0x00000F00 */
+#define GPIO_ADVCFGRH_10         	GPIO_ADVCFGRH_10_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH10     (0x1UL << GPIO_ADVCFGRH_10_Pos)         /*!< 0x00000100 */
+#define GPIO_ADVCFGRH_DE10          (0x2UL << GPIO_ADVCFGRH_10_Pos)         /*!< 0x00000200 */
+#define GPIO_ADVCFGRH_INVCLK10      (0x4UL << GPIO_ADVCFGRH_10_Pos)         /*!< 0x00000400 */
+#define GPIO_ADVCFGRH_RET10         (0x8UL << GPIO_ADVCFGRH_10_Pos)         /*!< 0x00000800 */
+#define GPIO_ADVCFGRH_11_Pos     	(12U)
+#define GPIO_ADVCFGRH_11_Msk     	(0xFU << GPIO_ADVCFGRH_11_Pos)     /*!< 0x0000F000 */
+#define GPIO_ADVCFGRH_11         	GPIO_ADVCFGRH_11_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH11     (0x1UL << GPIO_ADVCFGRH_11_Pos)         /*!< 0x00001000 */
+#define GPIO_ADVCFGRH_DE11          (0x2UL << GPIO_ADVCFGRH_11_Pos)         /*!< 0x00002000 */
+#define GPIO_ADVCFGRH_INVCLK11      (0x4UL << GPIO_ADVCFGRH_11_Pos)         /*!< 0x00004000 */
+#define GPIO_ADVCFGRH_RET11         (0x8UL << GPIO_ADVCFGRH_11_Pos)         /*!< 0x00008000 */
+#define GPIO_ADVCFGRH_12_Pos    	(16U)
+#define GPIO_ADVCFGRH_12_Msk     	(0xFU << GPIO_ADVCFGRH_12_Pos)     /*!< 0x000F0000 */
+#define GPIO_ADVCFGRH_12         	GPIO_ADVCFGRH_12_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH12     (0x1UL << GPIO_ADVCFGRH_12_Pos)         /*!< 0x00010000 */
+#define GPIO_ADVCFGRH_DE12          (0x2UL << GPIO_ADVCFGRH_12_Pos)         /*!< 0x00020000 */
+#define GPIO_ADVCFGRH_INVCLK12      (0x4UL << GPIO_ADVCFGRH_12_Pos)         /*!< 0x00040000 */
+#define GPIO_ADVCFGRH_RET12         (0x8UL << GPIO_ADVCFGRH_12_Pos)         /*!< 0x00080000 */
+#define GPIO_ADVCFGRH_13_Pos     	(20U)
+#define GPIO_ADVCFGRH_13_Msk     	(0xFU << GPIO_ADVCFGRH_13_Pos)     /*!< 0x00F00000 */
+#define GPIO_ADVCFGRH_13         	GPIO_ADVCFGRH_13_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH13     (0x1UL << GPIO_ADVCFGRH_13_Pos)         /*!< 0x00100000 */
+#define GPIO_ADVCFGRH_DE13          (0x2UL << GPIO_ADVCFGRH_13_Pos)         /*!< 0x00200000 */
+#define GPIO_ADVCFGRH_INVCLK13      (0x4UL << GPIO_ADVCFGRH_13_Pos)         /*!< 0x00400000 */
+#define GPIO_ADVCFGRH_RET13         (0x8UL << GPIO_ADVCFGRH_13_Pos)         /*!< 0x00800000 */
+#define GPIO_ADVCFGRH_14_Pos     	(24U)
+#define GPIO_ADVCFGRH_14_Msk     	(0xFU << GPIO_ADVCFGRH_14_Pos)     /*!< 0x0F000000 */
+#define GPIO_ADVCFGRH_14         	GPIO_ADVCFGRH_14_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH14     (0x1UL << GPIO_ADVCFGRH_14_Pos)         /*!< 0x01000000 */
+#define GPIO_ADVCFGRH_DE14          (0x2UL << GPIO_ADVCFGRH_14_Pos)         /*!< 0x02000000 */
+#define GPIO_ADVCFGRH_INVCLK14      (0x4UL << GPIO_ADVCFGRH_14_Pos)         /*!< 0x04000000 */
+#define GPIO_ADVCFGRH_RET14         (0x8UL << GPIO_ADVCFGRH_14_Pos)         /*!< 0x08000000 */
+#define GPIO_ADVCFGRH_15_Pos     	(28U)
+#define GPIO_ADVCFGRH_15_Msk     	(0xFU << GPIO_ADVCFGRH_15_Pos)     /*!< 0xF0000000 */
+#define GPIO_ADVCFGRH_15         	GPIO_ADVCFGRH_15_Msk               /*!< [3:0]: Port x IO pin y configuration (y = 8 to 15)Successful read or write to this bit must be secure if SECy bit is set in GPIOx_SECCFGR, and must be privileged if PRIVy bit is set in GPIOx_PRIVCFGR.Only authorized CPU can read or write this bit, as described in Section1.4: IO pin allocation to compartments. Illegal read returns zero. Illegal write is ignored. */
+#define GPIO_ADVCFGRH_DLYPATH15     (0x1UL << GPIO_ADVCFGRH_15_Pos)         /*!< 0x10000000 */
+#define GPIO_ADVCFGRH_DE15          (0x2UL << GPIO_ADVCFGRH_15_Pos)         /*!< 0x20000000 */
+#define GPIO_ADVCFGRH_INVCLK15      (0x4UL << GPIO_ADVCFGRH_15_Pos)         /*!< 0x40000000 */
+#define GPIO_ADVCFGRH_RET15         (0x8UL << GPIO_ADVCFGRH_15_Pos)         /*!< 0x80000000 */
 
 /****************  Bit definition for GPIO_CIDCFGR0 register  *****************/
 #define GPIO_CIDCFGR0_CFEN_Pos         (0U)
@@ -12908,6 +12973,15 @@ typedef struct
 #define TAMP_CR1_ITAMP11E_Pos        (26U)
 #define TAMP_CR1_ITAMP11E_Msk        (0x1U << TAMP_CR1_ITAMP11E_Pos)                    /*!< 0x04000000U */
 #define TAMP_CR1_ITAMP11E            TAMP_CR1_ITAMP11E_Msk
+#define TAMP_CR1_ITAMP12E_Pos        (27U)
+#define TAMP_CR1_ITAMP12E_Msk        (0x1U << TAMP_CR1_ITAMP12E_Pos)                    /*!< 0x08000000U */
+#define TAMP_CR1_ITAMP12E            TAMP_CR1_ITAMP12E_Msk
+#define TAMP_CR1_ITAMP14E_Pos        (29U)
+#define TAMP_CR1_ITAMP14E_Msk        (0x1U << TAMP_CR1_ITAMP14E_Pos)                    /*!< 0x20000000U */
+#define TAMP_CR1_ITAMP14E            TAMP_CR1_ITAMP14E_Msk
+#define TAMP_CR1_ITAMP15E_Pos        (30U)
+#define TAMP_CR1_ITAMP15E_Msk        (0x1U << TAMP_CR1_ITAMP15E_Pos)                    /*!< 0x40000000U */
+#define TAMP_CR1_ITAMP15E            TAMP_CR1_ITAMP15E_Msk
 
 /********************  Bits definition for TAMP_CR2 register  *****************/
 #define TAMP_CR2_TAMP1NOER_Pos       (0U)
@@ -13002,6 +13076,15 @@ typedef struct
 #define TAMP_CR3_ITAMP11NOER_Pos     (10U)
 #define TAMP_CR3_ITAMP11NOER_Msk     (0x1U << TAMP_CR3_ITAMP11NOER_Pos)                 /*!< 0x00000400U */
 #define TAMP_CR3_ITAMP11NOER         TAMP_CR3_ITAMP11NOER_Msk
+#define TAMP_CR3_ITAMP12NOER_Pos     (11U)
+#define TAMP_CR3_ITAMP12NOER_Msk     (0x1U << TAMP_CR3_ITAMP12NOER_Pos)                 /*!< 0x00000800U */
+#define TAMP_CR3_ITAMP12NOER         TAMP_CR3_ITAMP12NOER_Msk
+#define TAMP_CR3_ITAMP14NOER_Pos     (13U)
+#define TAMP_CR3_ITAMP14NOER_Msk     (0x1U << TAMP_CR3_ITAMP14NOER_Pos)                 /*!< 0x00002000U */
+#define TAMP_CR3_ITAMP14NOER         TAMP_CR3_ITAMP14NOER_Msk
+#define TAMP_CR3_ITAMP15NOER_Pos     (14U)
+#define TAMP_CR3_ITAMP15NOER_Msk     (0x1U << TAMP_CR3_ITAMP15NOER_Pos)                 /*!< 0x00004000U */
+#define TAMP_CR3_ITAMP15NOER         TAMP_CR3_ITAMP15NOER_Msk
 
 /********************  Bits definition for TAMP_FLTCR register  ***************/
 #define TAMP_FLTCR_TAMPFREQ_Pos      (0U)
@@ -13270,6 +13353,15 @@ typedef struct
 #define TAMP_IER_ITAMP11IE_Pos       (26U)
 #define TAMP_IER_ITAMP11IE_Msk       (0x1U << TAMP_IER_ITAMP11IE_Pos)                  /*!< 0x04000000U */
 #define TAMP_IER_ITAMP11IE           TAMP_IER_ITAMP11IE_Msk
+#define TAMP_IER_ITAMP12IE_Pos       (27U)
+#define TAMP_IER_ITAMP12IE_Msk       (0x1U << TAMP_IER_ITAMP12IE_Pos)                  /*!< 0x08000000U */
+#define TAMP_IER_ITAMP12IE           TAMP_IER_ITAMP12IE_Msk
+#define TAMP_IER_ITAMP14IE_Pos       (29U)
+#define TAMP_IER_ITAMP14IE_Msk       (0x1U << TAMP_IER_ITAMP14IE_Pos)                  /*!< 0x20000000U */
+#define TAMP_IER_ITAMP14IE           TAMP_IER_ITAMP14IE_Msk
+#define TAMP_IER_ITAMP15IE_Pos       (30U)
+#define TAMP_IER_ITAMP15IE_Msk       (0x1U << TAMP_IER_ITAMP15IE_Pos)                  /*!< 0x40000000U */
+#define TAMP_IER_ITAMP15IE           TAMP_IER_ITAMP15IE_Msk
 
 /********************  Bits definition for TAMP_SR register  *****************/
 #define TAMP_SR_TAMP1F_Pos           (0U)
@@ -13326,6 +13418,15 @@ typedef struct
 #define TAMP_SR_ITAMP11F_Pos         (26U)
 #define TAMP_SR_ITAMP11F_Msk         (0x1U << TAMP_SR_ITAMP11F_Pos)                    /*!< 0x04000000U */
 #define TAMP_SR_ITAMP11F             TAMP_SR_ITAMP11F_Msk
+#define TAMP_SR_ITAMP12F_Pos         (27U)
+#define TAMP_SR_ITAMP12F_Msk         (0x1U << TAMP_SR_ITAMP12F_Pos)                    /*!< 0x08000000U */
+#define TAMP_SR_ITAMP12F             TAMP_SR_ITAMP12F_Msk
+#define TAMP_SR_ITAMP14F_Pos         (29U)
+#define TAMP_SR_ITAMP14F_Msk         (0x1U << TAMP_SR_ITAMP14F_Pos)                    /*!< 0x20000000U */
+#define TAMP_SR_ITAMP14F             TAMP_SR_ITAMP14F_Msk
+#define TAMP_SR_ITAMP15F_Pos         (30U)
+#define TAMP_SR_ITAMP15F_Msk         (0x1U << TAMP_SR_ITAMP15F_Pos)                    /*!< 0x40000000U */
+#define TAMP_SR_ITAMP15F             TAMP_SR_ITAMP15F_Msk
 
 /********************  Bits definition for TAMP_MISR register  ****************/
 #define TAMP_MISR_TAMP1MF_Pos        (0U)
@@ -13382,6 +13483,15 @@ typedef struct
 #define TAMP_MISR_ITAMP11MF_Pos      (26U)
 #define TAMP_MISR_ITAMP11MF_Msk      (0x1U << TAMP_MISR_ITAMP11MF_Pos)                 /*!< 0x04000000U */
 #define TAMP_MISR_ITAMP11MF          TAMP_MISR_ITAMP11MF_Msk
+#define TAMP_MISR_ITAMP12MF_Pos      (27U)
+#define TAMP_MISR_ITAMP12MF_Msk      (0x1U << TAMP_MISR_ITAMP12MF_Pos)                 /*!< 0x08000000U */
+#define TAMP_MISR_ITAMP12MF          TAMP_MISR_ITAMP12MF_Msk
+#define TAMP_MISR_ITAMP14MF_Pos      (29U)
+#define TAMP_MISR_ITAMP14MF_Msk      (0x1U << TAMP_MISR_ITAMP14MF_Pos)                 /*!< 0x20000000U */
+#define TAMP_MISR_ITAMP14MF          TAMP_MISR_ITAMP14MF_Msk
+#define TAMP_MISR_ITAMP15MF_Pos      (30U)
+#define TAMP_MISR_ITAMP15MF_Msk      (0x1U << TAMP_MISR_ITAMP15MF_Pos)                 /*!< 0x40000000U */
+#define TAMP_MISR_ITAMP15MF          TAMP_MISR_ITAMP15MF_Msk
 
 /********************  Bits definition for TAMP_SMISR register  ************ *****/
 #define TAMP_SMISR_TAMP1MF_Pos       (0U)
@@ -13438,6 +13548,15 @@ typedef struct
 #define TAMP_SMISR_ITAMP11MF_Pos     (26U)
 #define TAMP_SMISR_ITAMP11MF_Msk     (0x1U << TAMP_SMISR_ITAMP11MF_Pos)                /*!< 0x020400000U */
 #define TAMP_SMISR_ITAMP11MF         TAMP_SMISR_ITAMP11MF_Msk
+#define TAMP_SMISR_ITAMP12MF_Pos     (27U)
+#define TAMP_SMISR_ITAMP12MF_Msk     (0x1U << TAMP_SMISR_ITAMP12MF_Pos)                /*!< 0x080000000U */
+#define TAMP_SMISR_ITAMP12MF         TAMP_SMISR_ITAMP12MF_Msk
+#define TAMP_SMISR_ITAMP14MF_Pos     (29U)
+#define TAMP_SMISR_ITAMP14MF_Msk     (0x1U << TAMP_SMISR_ITAMP14MF_Pos)                /*!< 0x200000000U */
+#define TAMP_SMISR_ITAMP14MF         TAMP_SMISR_ITAMP14MF_Msk
+#define TAMP_SMISR_ITAMP15MF_Pos     (30U)
+#define TAMP_SMISR_ITAMP15MF_Msk     (0x1U << TAMP_SMISR_ITAMP15MF_Pos)                /*!< 0x400000000U */
+#define TAMP_SMISR_ITAMP15MF         TAMP_SMISR_ITAMP15MF_Msk
 
 /********************  Bits definition for TAMP_SCR register  *****************/
 #define TAMP_SCR_CTAMP1F_Pos         (0U)
@@ -13494,6 +13613,15 @@ typedef struct
 #define TAMP_SCR_CITAMP11F_Pos       (26U)
 #define TAMP_SCR_CITAMP11F_Msk       (0x1U << TAMP_SCR_CITAMP11F_Pos)                  /*!< 0x00200000U */
 #define TAMP_SCR_CITAMP11F           TAMP_SCR_CITAMP11F_Msk
+#define TAMP_SCR_CITAMP12F_Pos       (27U)
+#define TAMP_SCR_CITAMP12F_Msk       (0x1U << TAMP_SCR_CITAMP12F_Pos)                  /*!< 0x00400000U */
+#define TAMP_SCR_CITAMP12F           TAMP_SCR_CITAMP12F_Msk
+#define TAMP_SCR_CITAMP14F_Pos       (29U)
+#define TAMP_SCR_CITAMP14F_Msk       (0x1U << TAMP_SCR_CITAMP14F_Pos)                  /*!< 0x20000000U */
+#define TAMP_SCR_CITAMP14F           TAMP_SCR_CITAMP14F_Msk
+#define TAMP_SCR_CITAMP15F_Pos       (30U)
+#define TAMP_SCR_CITAMP15F_Msk       (0x1U << TAMP_SCR_CITAMP15F_Pos)                  /*!< 0x40000000U */
+#define TAMP_SCR_CITAMP15F           TAMP_SCR_CITAMP15F_Msk
 
 /*******************  Bits definition for TAMP_COUNT1R register  **************/
 #define TAMP_COUNT1R_Pos              (0U)
@@ -14319,6 +14447,18 @@ typedef struct
 #define WWDG_SIDR_SID_Msk       (0xFFFFFFFFU << WWDG_SIDR_SID_Pos)/*!< 0xFFFFFFFF */
 #define WWDG_SIDR_SID           WWDG_SIDR_SID_Msk                 /*!< The address decoding range is 1 Kbyte */
 
+#define IS_DMA_PFREQ_INSTANCE(INSTANCE)  (((INSTANCE) == HPDMA1_Channel12)  || \
+                                          ((INSTANCE) == HPDMA1_Channel13)  || \
+                                          ((INSTANCE) == HPDMA1_Channel14)  || \
+                                          ((INSTANCE) == HPDMA1_Channel15)  || \
+                                          ((INSTANCE) == HPDMA2_Channel12)  || \
+                                          ((INSTANCE) == HPDMA2_Channel13)  || \
+                                          ((INSTANCE) == HPDMA2_Channel14)  || \
+                                          ((INSTANCE) == HPDMA2_Channel15)  || \
+                                          ((INSTANCE) == HPDMA3_Channel12)  || \
+                                          ((INSTANCE) == HPDMA3_Channel13)  || \
+                                          ((INSTANCE) == HPDMA3_Channel14)  || \
+                                          ((INSTANCE) == HPDMA3_Channel15))
 /**
   * @}
   */
@@ -14384,6 +14524,9 @@ typedef struct
                                        ((INSTANCE) == I3C4))
 /******************************** I2C Instances *******************************/
 #define IS_I2C_ALL_INSTANCE(INSTANCE) ((INSTANCE) == I2C8)
+
+/******************* I2C Instances : Group belongingness *********************/
+#define IS_I2C_GRP1_INSTANCE(INSTANCE) IS_I2C_ALL_INSTANCE(INSTANCE)
 
 /************** I2C Instances : wakeup capability from stop modes *************/
 #define IS_I2C_WAKEUP_FROMSTOP_INSTANCE(INSTANCE) IS_I2C_ALL_INSTANCE(INSTANCE)

@@ -32,5 +32,6 @@ uint32_t Serial_Scanf(uint32_t value);
 void Serial_Putchar(char value);
 void Serial_Printf(char *value, int len);
 void Error_Handler(void);
+void valid_delay_us(unsigned long delay_us);
 
 #endif /* __DDR_TOOL_UTIL_H */

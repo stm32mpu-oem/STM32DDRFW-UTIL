@@ -1267,11 +1267,11 @@ void Reset_Handler(void) {
 /*----------------------------------------------------------------------------
   Default vector handlers for vector table
  *----------------------------------------------------------------------------*/
-__attribute__ ((weakref("While1_ITHandler"))) static void Default_Undef_Handler(void);
+__attribute__ ((weakref("While1_UndefITHandler"))) static void Default_Undef_Handler(void);
 __attribute__ ((weakref("Nop_ITHandler"))) static void Default_SVC_Handler(void);
-__attribute__ ((weakref("While1_ITHandler"))) static void Default_PAbt_Handler(void);
-__attribute__ ((weakref("While1_ITHandler"))) static void Default_DAbt_Handler(void);
-__attribute__ ((weakref("While1_ITHandler"))) static void Default_Rsvd_Handler(void);
+__attribute__ ((weakref("While1_PAbtITHandler"))) static void Default_PAbt_Handler(void);
+__attribute__ ((weakref("While1_DAbtITHandler"))) static void Default_DAbt_Handler(void);
+__attribute__ ((weakref("While1_RsvdITHandler"))) static void Default_Rsvd_Handler(void);
 __attribute__ ((weakref("Nop_ITHandler"))) static void Default_IRQ_Handler(void);
 __attribute__ ((weakref("Nop_ITHandler"))) static void Default_FIQ_Handler(void);
 
@@ -1288,6 +1288,22 @@ __attribute__ ((weak, alias("Default_ITHandler"))) void AAA_Default_ITHandler(vo
 __attribute__ ((interrupt)) void Nop_ITHandler(void)
 {
   return;
+}
+__attribute__ ((interrupt)) void While1_UndefITHandler(void)
+{
+  while(1);
+}
+__attribute__ ((interrupt)) void While1_DAbtITHandler(void)
+{
+  while(1);
+}
+__attribute__ ((interrupt)) void While1_PAbtITHandler(void)
+{
+  while(1);
+}
+__attribute__ ((interrupt)) void While1_RsvdITHandler(void)
+{
+  while(1);
 }
 __attribute__ ((interrupt)) void While1_ITHandler(void)
 {

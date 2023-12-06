@@ -64,7 +64,8 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 #define CMD_MAX_LEN 1024
-#define CMD_MAX_ARG 255
+#define CMD_MAX_ARG 3
+#define DDR_NAME_MAX_LEN 128
 
 static uint32_t DDR_Test_All(uint32_t loop, uint32_t size, uint32_t addr);
 
@@ -191,7 +192,7 @@ static uint32_t DDR_Test_All(uint32_t loop, uint32_t size, uint32_t addr)
 
     if (ret != 0)
     {
-      printf("%s failed [%ld]\n\r", test[i].name, ret);
+      printf("%s failed [%d]\n\r", test[i].name, ret);
       return ret;
     }
 
@@ -278,7 +279,6 @@ static int parse_entry_string(char *entry, size_t size, int *command,
     else
     {
       arg.len = i - arg.off;
-      argv[n - 1] = (char *)malloc(arg.len + 1);
       strncpy(argv[n - 1], &entry[arg.off], arg.len);
       strncpy(argv[n - 1] + arg.len, "\0", 1);
     }
@@ -425,16 +425,6 @@ static bool check_step(HAL_DDR_InteractStepTypeDef step,
   return true;
 }
 
-static void free_args(int argc, char *argv[])
-{
-  int i;
-
-  for (i = 1; i < argc; i++)
-  {
-    free(argv[i - 1]);
-  }
-}
-
 static bool pll2_set_rate(uint64_t pll2_clk_rate)
 {
   RCC_PLLInitTypeDef PLL2;
@@ -483,7 +473,7 @@ static bool pll2_set_rate(uint64_t pll2_clk_rate)
 static void do_info(HAL_DDR_InteractStepTypeDef step, int argc, char *argv[])
 {
   unsigned long value;
-  static char *ddr_name;
+  static char ddr_name[DDR_NAME_MAX_LEN];
   char *end_ptr;
 
   if (argc == 1)
@@ -491,7 +481,7 @@ static void do_info(HAL_DDR_InteractStepTypeDef step, int argc, char *argv[])
     printf("step = %d : %s\n\r", step, step_str[step]);
     printf("name = %s\n\r", static_ddr_config.info.name);
     printf("size = 0x%lx\n\r", static_ddr_config.info.size);
-    printf("speed = %ld kHz\n\r", static_ddr_config.info.speed);
+    printf("speed = %d kHz\n\r", static_ddr_config.info.speed);
     return;
   }
 
@@ -503,7 +493,7 @@ static void do_info(HAL_DDR_InteractStepTypeDef step, int argc, char *argv[])
 
   if (!strcmp(argv[0], "name"))
   {
-    uint32_t i;
+    int i;
     uint32_t name_len = argc;
 
     for (i = 1; i < (argc - 1); i++)
@@ -511,18 +501,7 @@ static void do_info(HAL_DDR_InteractStepTypeDef step, int argc, char *argv[])
       name_len += strlen(argv[i]) + 1;
     }
 
-    if (ddr_name)
-    {
-      free(ddr_name);
-    }
-
-    ddr_name = malloc(name_len);
     static_ddr_config.info.name = ddr_name;
-    if (!ddr_name)
-    {
-      printf("alloc error, length %ld\n\r", name_len);
-      return;
-    }
 
     strcpy(ddr_name, argv[1]);
     for (i = 2; i < (argc - 1); i++)
@@ -560,7 +539,7 @@ static void do_info(HAL_DDR_InteractStepTypeDef step, int argc, char *argv[])
     else
     {
       static_ddr_config.info.speed = value;
-      printf("speed = %ld kHz\n\r", static_ddr_config.info.speed);
+      printf("speed = %d kHz\n\r", static_ddr_config.info.speed);
       value = (unsigned long)HAL_RCCEx_GetPLL2ClockFreq() * 2;
       printf("DDRPHY = %ld kHz\n\r", value / 1000);
     }
@@ -696,6 +675,11 @@ end:
   return step;
 }
 
+static char argv0[CMD_MAX_LEN / 4] = "\0";
+static char argv1[CMD_MAX_LEN / 4] = "\0";
+static char argv2[CMD_MAX_LEN / 4] = "\0";
+static char argv3[CMD_MAX_LEN / 4] = "\0";
+
 static void do_subcmd(int argc, char *argv[], const subcmd_desc *array,
                       const int size)
 {
@@ -703,7 +687,6 @@ static void do_subcmd(int argc, char *argv[], const subcmd_desc *array,
   int64_t value;
   int local_argc = argc;
   uint32_t retcode;
-  char arg_zero[2] = "0\0";
 
   if (local_argc == 1)
   {
@@ -731,11 +714,20 @@ static void do_subcmd(int argc, char *argv[], const subcmd_desc *array,
     switch (local_argc - 2)
     {
     case 0:
-      argv[1] = arg_zero;
+      argv1[0] = argv2[0] = argv3[0] = '0';
+      argv1[1] = argv2[1] = argv3[1] = '\0';
+      local_argc = array[value].max_args + 2;
+      break;
     case 1:
-      argv[2] = arg_zero;
+      argv2[0] = argv3[0] = '0';
+      argv2[1] = argv3[1] = '\0';
+      local_argc = array[value].max_args + 2;
+      break;
     case 2:
-      argv[3] = arg_zero;
+      argv3[0] = '0';
+      argv3[1] = '\0';
+      local_argc = array[value].max_args + 2;
+      break;
     case 3:
       local_argc = array[value].max_args + 2;
       break;
@@ -790,7 +782,7 @@ static void do_subcmd(int argc, char *argv[], const subcmd_desc *array,
 
   if (retcode != 0)
   {
-    printf("%s failed [%ld]\n\r", array[value].name, retcode);
+    printf("%s failed [%d]\n\r", array[value].name, retcode);
     return;
   }
 
@@ -800,7 +792,7 @@ static void do_subcmd(int argc, char *argv[], const subcmd_desc *array,
 bool HAL_DDR_Interactive(HAL_DDR_InteractStepTypeDef step)
 {
   char buffer[CMD_MAX_LEN];
-  char *argv[CMD_MAX_ARG + 1]; /* NULL terminated */
+  char *argv[CMD_MAX_ARG + 1] = {argv0, argv1, argv2, argv3}; /* NULL terminated */
   int argc;
   int cmd;
   static int next_step = -1;
@@ -817,7 +809,7 @@ bool HAL_DDR_Interactive(HAL_DDR_InteractStepTypeDef step)
     return false;
   }
 
-  if (step < 0 || step > STEP_RUN)
+  if (step > STEP_RUN)
   {
     printf("** step %d ** INVALID\n\r", step);
     return false;
@@ -881,7 +873,7 @@ bool HAL_DDR_Interactive(HAL_DDR_InteractStepTypeDef step)
       break;
 
     case DDR_CMD_EDIT:
-      HAL_DDR_Edit_Reg(argv[0], argv[1]);
+      HAL_DDR_Edit_Reg(argv0, argv1);
       break;
 
     case DDR_CMD_SAVE:
@@ -908,7 +900,6 @@ bool HAL_DDR_Interactive(HAL_DDR_InteractStepTypeDef step)
     case DDR_CMD_TEST:
       if (!check_step(step, STEP_DDR_READY))
       {
-        free_args(argc, argv);
         continue;
       }
       do_subcmd(argc, argv, test, test_nb);
@@ -917,8 +908,6 @@ bool HAL_DDR_Interactive(HAL_DDR_InteractStepTypeDef step)
     default:
       break;
     }
-
-    free_args(argc, argv);
   }
 
   return next_step == STEP_DDR_RESET;

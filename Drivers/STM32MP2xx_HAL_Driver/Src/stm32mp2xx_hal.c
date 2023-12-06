@@ -52,9 +52,9 @@
  * @brief STM32MP2xx HAL Driver version number
    */
 #define __STM32MP2xx_HAL_VERSION_MAIN   (0x00) /*!< [31:24] main version */
-#define __STM32MP2xx_HAL_VERSION_SUB1   (0x01) /*!< [23:16] sub1 version */
+#define __STM32MP2xx_HAL_VERSION_SUB1   (0x03) /*!< [23:16] sub1 version */
 #define __STM32MP2xx_HAL_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
-#define __STM32MP2xx_HAL_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
+#define __STM32MP2xx_HAL_VERSION_RC     (0x05) /*!< [7:0]  release candidate */
 #define __STM32MP2xx_HAL_VERSION         ((__STM32MP2xx_HAL_VERSION_MAIN << 24)\
                                         |(__STM32MP2xx_HAL_VERSION_SUB1 << 16)\
                                         |(__STM32MP2xx_HAL_VERSION_SUB2 << 8 )\
@@ -223,7 +223,11 @@ __weak void HAL_MspDeInit(void)
    * So implementing a temporary version which is correct enough for current verification work
    * !!!!!!!!!!!!!!
    */
+#ifdef __AARCH64__
+__weak HAL_StatusTypeDef HAL_InitTick(__attribute__((unused)) uint32_t TickPriority)
+#else
 __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+#endif /* AARCH64 */
 {
   /* Configure the SysTick to have interrupt in 1ms timebase */
 #if defined (CORE_CA35)
@@ -233,7 +237,9 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 #if !defined(A35_NON_SECURE)
   /* - by starting its source clock aka Secure Timestamp Generator (STGEN)*/
   /*   clocked itself by cl_ker_stgen managed by RCC */
+#ifndef __AARCH64__
   SystemA35_TZ_STGEN_Start(HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_STGEN));
+#endif
   /* Note : when A35 is in non-secure state at EL1, */
   /*        EL3 monitor has already started Secure Timestamp Generator */
 #endif /* !defined(A35_NON_SECURE) */
@@ -241,7 +247,9 @@ __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /*   Warning ! TickPriority value shall be compliant with GIC400 Priority */
   /*             Dynamics (see #3.3 in [ARM IHI0048B]). It shall be in range */
   /*             [0;(1<<GIC_PRIO_BITS)-1] and be set according to secure state. */
+#ifndef __AARCH64__
   SystemA35_SYSTICK_Config(TickPriority);
+#endif
 
 #elif defined (CORE_CM33)
   /* In Cortex-M33 case, configure SysTick period according to platform frequency */

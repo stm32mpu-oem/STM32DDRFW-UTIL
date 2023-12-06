@@ -314,7 +314,7 @@ struct regval {
   uint8_t val;
 };
 
-int STPMIC2_Reset(STPMIC2_Object_t *pObj)
+int STPMIC2_Reset(__attribute__((unused)) STPMIC2_Object_t *pObj)
 {
   int32_t ret = STPMIC2_OK;
 
@@ -374,7 +374,7 @@ int32_t STPMIC2_DeInit(STPMIC2_Object_t *pObj)
   */
 int32_t STPMIC2_ReadID(STPMIC2_Object_t *pObj, uint8_t *pId)
 {
-  int32_t ret;
+  int32_t ret=STPMIC2_OK;
 
   /* Initialize I2C */
   pObj->IO.Init();

@@ -6,3 +6,4 @@
 | BSP for STM32MP2 Series MPUs    | STMicroelectronics                 | BSD-3-Clause                                     |
 | DDR_Tool                        | STMicroelectronics                 | BSD-3-Clause                                     |
 | imageheader                     | STMicroelectronics                 | BSD-3-Clause                                     |
+| resourcemanager                 | STMicroelectronics                 | BSD-3-Clause                                     |

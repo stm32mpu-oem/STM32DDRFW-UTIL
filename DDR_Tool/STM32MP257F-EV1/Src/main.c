@@ -28,14 +28,28 @@
   * @{
   */
 
+/* External functions ------------------------------------------------------- */
+void _Reset_EL3(void) asm("_Reset_EL3");
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+/* STGEN (HSI) default frequency according to selected platform */
+#define STGEN_DEFAULT_FREQUENCY_IN_HZ HSI_VALUE
+
+/* Function pointer */
+void (*p_function)(void);
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+/* STGEN frequency : same as HSI frequency */
+static uint32_t STGENFreqHz = STGEN_DEFAULT_FREQUENCY_IN_HZ;
+
 /* Private function prototypes -----------------------------------------------*/
-static void SystemClock_Config(void);
+static uint32_t SystemClock_Config(void);
 
 /* Private functions ---------------------------------------------------------*/
+void Mon_EndOfApplication( void );
+void Mon_A35SystemClockConfig( void );
 
 /**
   * @brief  Main program
@@ -57,8 +71,19 @@ int main(void)
 
   HAL_Init();
 
+  /* Dummy delay to ensure SysTick is running fine
+   * If it is not we will be stuck here
+   */
+  valid_delay_us(10 * 1000);
+
+  /* Configure A35 system clock, because some parts are only reachable in EL3 */
+  Mon_A35SystemClockConfig();
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* Update System clock variable SystemCoreClock for debug */
+  SystemCoreClockUpdate();
 
   /*  Configure USART for logging messages  */
   UART_Config();
@@ -74,7 +99,7 @@ int main(void)
   BSP_LED_Init(LED_GREEN);
 
   /* Insert 1 second delay */
-  HAL_Delay(1000);
+  valid_delay_us(100 * 1000);
 
   iddr.wakeup_from_standby = false;
   iddr.self_refresh = false;
@@ -94,108 +119,50 @@ int main(void)
   BSP_LED_Toggle(LED_GREEN);
 
   /* Insert 1 second delay */
-  HAL_Delay(1000);
+  valid_delay_us(100 * 1000);
 
   /* Toggle LED3 OFF */
   BSP_LED_Toggle(LED_GREEN);
   }
 }
 
+void Mon_A35SystemClockConfig( void )
+{
+#define STGENC_START_VAL              0x3UL
 
-/*
-Component              | Parent  |   Frequency     | Status | Comment                           |
-                       |         |                 | Note: the status is given before EN gate   |
------------------------|---------|-----------------|--------|-----------------------------------|
-LSI                    |N.A.     |    0.032000 MHz |   ON   | Mandatory for IWDG, DAC
-  DAC                  |LSI      |    0.032000 MHz |   ON   |
-LSE                    |N.A.     |    0.032768 MHz |   ON   | Mandatory for TEMP
-  CEC                  |LSE      |    0.032768 MHz |   ON   |
-HSI                    |N.A.     |   64.000000 MHz |   ON   |
-  MCO1                 |HSI      |   64.000000 MHz |   OFF  |
-HSE                    |N.A.     |   24.000000 MHz |   ON   |
-  DSIPLL               |HSE      |  125.000000 MHz |   OFF  | DSI DPHY PLL max frequency
-    BLCLK              |DSIPLL   |  125.000000 MHz |   OFF  | DSI lanebyte clock
-  RTCDIV               |HSE      |    0.923077 MHz |   ON   |
-    RTC                |RTCDIV   |    0.923077 MHz |   ON   |
-  PLL1                 |HSE      | 1296.000000 MHz |   ON   |
-    PLL1P              |PLL1     |  648.000000 MHz |   ON   |
-      Cortex-A7        |PLL1P    |  648.000000 MHz |   ON   |
-        MCO2           |Cortex-A7|  648.000000 MHz |   OFF  |
-  PLL2                 |HSE      | 1056.000000 MHz |   ON   |
-    PLL2P              |PLL2     |  264.000000 MHz |   ON   |
-      AXI              |PLL2P    |  264.000000 MHz |   ON   |
-        FMC            |AXI      |  264.000000 MHz |   ON   | NAND flash
-        QSPI           |AXI      |  264.000000 MHz |   ON   | NOR flash
-        AHB5           |AXI      |  264.000000 MHz |   ON   |
-          HASH1        |AHB5     |  264.000000 MHz |   ON   |
-          GPIOZ        |AHB5     |  264.000000 MHz |   ON   |
-        AHB6           |AXI      |  264.000000 MHz |   ON   |
-          USBH         |AHB6     |  264.000000 MHz |   ON   | USB Host hub (Type A)
-          APB4         |AHB6     |  132.000000 MHz |   ON   |
-            STGEN      |APB4     |  132.000000 MHz |   ON   |
-          APB5         |AHB6     |   66.000000 MHz |   ON   | Needs to be <67MHz for BSEC
-            BSEC       |APB5     |   66.000000 MHz |   ON   |
-            ETZPC      |APB5     |   66.000000 MHz |   ON   |
-            TZC400     |APB5     |   66.000000 MHz |   ON   |
-            I2C4       |APB5     |   66.000000 MHz |   ON   | PMIC
-            SPI6       |APB5     |   66.000000 MHz |   ON   |
-            USART1     |APB5     |   66.000000 MHz |   ON   |
-        DEBUG          |AXI      |  132.000000 MHz |   ON   | JTAG & Coresight
-    PLL2Q              |PLL2     |  528.000000 MHz |   ON   |
-      GPU              |PLL2Q    |  528.000000 MHz |   ON   |
-    PLL2R              |PLL2     |  528.000000 MHz |   ON   |
-      DDR              |PLL2R    |  528.000000 MHz |   ON   | DDR3
-  PLL3                 |HSE      |  688.000000 MHz |   ON   |
-    PLL3P              |PLL3     |  172.000000 MHz |   ON   |
-      MLAHB            |PLL3P    |  172.000000 MHz |   ON   | <200MHz
-        Cortex-M4      |MLAHB    |  172.000000 MHz |   ON   |
-        MCUSRAM        |MLAHB    |  172.000000 MHz |   ON   |
-        AHB1           |MLAHB    |  172.000000 MHz |   ON   | <200MHz
-          DMA1/2       |AHB1     |  172.000000 MHz |   ON   |
-        AHB2           |MLAHB    |  172.000000 MHz |   ON   | <200MHz
-        APB1           |MLAHB    |   86.000000 MHz |   ON   |
-          I2C2         |APB1     |   86.000000 MHz |   ON   | RPI2ID, USBHub, AudCodec,Cam, MFX, Disp, Eth
-          I2C5         |APB1     |   86.000000 MHz |   ON   | RPI2
-          UART4        |APB1     |   86.000000 MHz |   ON   | Linux console
-          USART3       |APB1     |   86.000000 MHz |   ON   | RPI2
-        TIM2           |MLAHB    |  172.000000 MHz |   ON   | TIMG1
-        TIM12          |MLAHB    |  172.000000 MHz |   ON   | TIMG1
-        APB2           |MLAHB    |   86.000000 MHz |   ON   |
-        TIM8           |MLAHB    |  172.000000 MHz |   ON   | TIMG2
-        APB3           |MLAHB    |   86.000000 MHz |   ON   |
-        AHB3           |MLAHB    |  172.000000 MHz |   ON   | <200MHz
-          DCMI         |AHB3     |  172.000000 MHz |   ON   | Camera
-        AHB4           |MLAHB    |  172.000000 MHz |   ON   | <200MHz
-          PWR          |AHB4     |  172.000000 MHz |   ON   |
-          RCC          |AHB4     |  172.000000 MHz |   ON   |
-          EXTI         |AHB4     |  172.000000 MHz |   ON   |
-    PLL3Q              |PLL3     |   49.142857 MHz |   ON   |
-      SPDIF            |PLL3Q    |   49.142857 MHz |   ON   | SPDIF RX
-      DFSDM            |PLL3Q    |   49.142857 MHz |   ON   | Digital micro
-      SAI2             |PLL3Q    |   49.142857 MHz |   ON   | AudCodec 48kHz (use PLL4Q 79MHz for 44.1kHz)
-      SAI4             |PLL3Q    |   49.142857 MHz |   ON   | SPDIF TX 48kHz (use PLL4Q 79MHz for 44.1kHz)
-    PLL3R              |PLL3     |  172.000000 MHz |   ON   |
-      SDMMC1           |PLL3R    |  172.000000 MHz |   ON   | µSD card
-      SDMMC2           |PLL3R    |  172.000000 MHz |   ON   | eMMC
-      SDMMC3           |PLL3R    |  172.000000 MHz |   ON   | Wifi
-  PLL4                 |HSE      |  632.000000 MHz |   ON   |
-    PLL4P              |PLL4     |  126.400002 MHz |   ON   |
-    PLL4Q              |PLL4     |   79.000000 MHz |   ON   |
-      LCD              |PLL4Q    |   79.000000 MHz |   ON   | LTDC & DSI display pixel clock
-      ADC              |PLL4Q    |   79.000000 MHz |   ON   | Use ADC internal divider to be <72MHz
-      FDCAN            |PLL4Q    |   79.000000 MHz |   ON   |
-    PLL4R              |PLL4     |   63.200001 MHz |   ON   |
-  USBPHYC              |HSE      |   24.000000 MHz |   ON   | USB PHY Ctrl for USB Host and OTG
-    USBPLL             |USBPHYC  |   48.000000 MHz |   ON   |
-      USBO             |USBPLL   |   48.000000 MHz |   ON   | USB OTG (micro AB)
-CSI                    |N.A.     |    4.000000 MHz |   ON   | Mandatory for IO compensation
-ck_per                 |N.A.     |    0.000000 MHz |   OFF  |
-ETH                    |N.A.     |    0.000000 MHz |   OFF  | ETH clocked by RGMII PHY on EVAL
------------------------|---------|-----------------|--------|-----------------------------------*/
-void SystemClock_Config(void)
+   volatile uint32_t reg32_val;
+
+   /* Start Secure Timestamp Generator (STGEN) */
+   /* (clock source of A35 secure/non-secure physical timers) */
+   /* by assuming its source clock is HSI at 32MHz/64MHz : */
+   /* - enable STGENRW/STGENRO clock */
+   /*   by setting RCC_STGENCFGR bit 1 "STGENEN" */
+   WRITE_REG(RCC->STGENCFGR,
+               READ_REG(RCC->STGENCFGR)|RCC_STGENCFGR_STGENEN);
+   /* - set STGEN frequency value to 32MHz/64MHz in dedicated register */
+   WRITE_REG(STGENC->CNTFID0, STGENFreqHz);
+   /* - set DBGMCU_CRA35 to halt timestamp generation on debug */
+   /*   by setting its bit 1 "DBG_STGEN_STOP" */
+   WRITE_REG(DBGMCU->CRA35,
+               READ_REG(DBGMCU->CRA35)|DBGMCU_CRA35_DBG_STGEN_STOP);
+   /* - start STGENC */
+   /*   by setting CNTCR bit 0 "EN" */
+   /*   and bit 1 "HDBG" (to halt timestamp generation on debug) */
+   WRITE_REG(STGENC->CNTCR,STGENC_START_VAL);
+
+   /* Set CNTFRQ_EL0 register according to STGEN frequency in Hz */
+   /* see ARM DDI0487B.a page 2673 #D7.5.1 "CNTFRQ_EL0" */
+   reg32_val = READ_REG(STGENC->CNTFID0);
+   asm volatile("MSR CNTFRQ_EL0, %0" : "=r" (reg32_val));
+
+   return;
+}
+
+static uint32_t SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_PLLInitTypeDef RCC_Pll1InitStruct = {0};
+  RCC_PLLInitTypeDef RCC_Pll3InitStruct = {0};
   RCC_PLLInitTypeDef RCC_Pll4InitStruct = {0};
   RCC_PLLInitTypeDef RCC_Pll5InitStruct = {0};
   RCC_PLLInitTypeDef RCC_Pll6InitStruct = {0};
@@ -203,10 +170,6 @@ void SystemClock_Config(void)
   RCC_PLLInitTypeDef RCC_Pll8InitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /* Reset clocks to a known state */
-  HAL_RCC_DeInit();
-
-  /* Enable all available oscillators*/
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSE |
                                      RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -215,9 +178,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
   RCC_OscInitStruct.LSEDriveValue = RCC_LSEDRIVE_MEDIUMHIGH;
 
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-    /* HAL RCC configuration error */
-    Error_Handler();
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    printf("%s: Failed to enable oscillators.\n\r", __func__);
+    while (1);
   }
 
   /* 1000MHz */
@@ -282,41 +246,47 @@ void SystemClock_Config(void)
 
   if (HAL_RCCEx_CA35SS_PLL1Config(&RCC_Pll1InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL1.\n\r");
-    printf("SystemClock_Config: Staying on external clock.\n\r");
+    printf("%s: Failed to enable PLL1.\n\r", __func__);
+    printf("%s: Staying on external clock.\n\r", __func__);
     while (1);
   }
 
   /* Switch back A35 on PLL1 */
   HAL_RCCEx_CA35SS_SetCA35SSClockSource(A35_SOURCE_PLL1);
 
+  if (HAL_RCCEx_PLL3Config(&RCC_Pll3InitStruct) != HAL_OK)
+  {
+    printf("%s: Failed to enable PLL3.\n\r", __func__);
+    while (1);
+  }
+
   if (HAL_RCCEx_PLL4Config(&RCC_Pll4InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL4.\n\r");
+    printf("%s: Failed to enable PLL4.\n\r", __func__);
     while (1);
   }
 
   if (HAL_RCCEx_PLL5Config(&RCC_Pll5InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL5.\n\r");
+    printf("%s: Failed to enable PLL5.\n\r", __func__);
     while (1);
   }
 
   if (HAL_RCCEx_PLL6Config(&RCC_Pll6InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL6.\n\r");
+    printf("%s: Failed to enable PLL6.\n\r", __func__);
     while (1);
   }
 
   if (HAL_RCCEx_PLL7Config(&RCC_Pll7InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL7.\n\r");
+    printf("%s: Failed to enable PLL7.\n\r", __func__);
     while (1);
   }
 
   if (HAL_RCCEx_PLL8Config(&RCC_Pll8InitStruct) != HAL_OK)
   {
-    printf("SystemClock_Config: Failed to enable PLL8.\n\r");
+    printf("%s: Failed to enable PLL8.\n\r", __func__);
     while (1);
   }
 
@@ -329,7 +299,7 @@ void SystemClock_Config(void)
                                 RCC_CLOCKTYPE_ICN_APBDBG;
 
   RCC_ClkInitStruct.ICN_HS_MCU.XBAR_ClkSrc = RCC_XBAR_CLKSRC_PLL4;
-  RCC_ClkInitStruct.ICN_HS_MCU.Div = 3;
+  RCC_ClkInitStruct.ICN_HS_MCU.Div = 4;
   RCC_ClkInitStruct.ICN_SDMMC.XBAR_ClkSrc = RCC_XBAR_CLKSRC_PLL4;
   RCC_ClkInitStruct.ICN_SDMMC.Div = 6;
   RCC_ClkInitStruct.ICN_DDR.XBAR_ClkSrc = RCC_XBAR_CLKSRC_PLL4;
@@ -351,8 +321,231 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0) != HAL_OK)
   {
-    /* HAL RCC configuration error */
-    Error_Handler();
+   printf("%s: Failed to configure bus clocks.\n\r", __func__);
+    while (1);
+  }
+
+  return 0;
+}
+
+typedef struct
+{
+  uint32_t PLLSource;   /*!< The new source of the PLL.
+                            This parameter can be a value of @ref RCC_PLL_Clock_Source                */
+  uint8_t  PLLState;    /*!< The new state of the PLL.
+                            This parameter can be a value of @ref RCC_PLL_State                       */
+  uint8_t  FREFDIV;
+  uint16_t FBDIV;
+  uint32_t FRACIN;
+  uint32_t POSTDIV1;
+  uint32_t POSTDIV2;
+} PLLInitTypeDef;
+
+static void GetPLLxConfig(PLLInitTypeDef  *pll_config, uint32_t PLL_num)
+{
+  switch (PLL_num)
+  {
+    case 1:
+      pll_config->PLLState = ((CA35SSC->PLL_ENABLE_RW & CA35SSC_PLL_ENABLE_RW_PLL_EN) == CA35SSC_PLL_ENABLE_RW_PLL_EN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL5_Msk) >> RCC_MUXSELCFGR_MUXSEL5_Pos;
+      pll_config->FREFDIV = (CA35SSC->PLL_FREQ1_RW & CA35SSC_PLL_FREQ1_RW_REFDIV_Msk) >> CA35SSC_PLL_FREQ1_RW_REFDIV_Pos;
+      pll_config->FBDIV = (CA35SSC->PLL_FREQ1_RW & CA35SSC_PLL_FREQ1_RW_FBDIV_Msk) >> CA35SSC_PLL_FREQ1_RW_FBDIV_Pos;
+      pll_config->FRACIN = 0;
+      pll_config->POSTDIV1 = (CA35SSC->PLL_FREQ2_RW & CA35SSC_PLL_FREQ2_RW_POSTDIV1_Msk) >> CA35SSC_PLL_FREQ2_RW_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (CA35SSC->PLL_FREQ2_RW & CA35SSC_PLL_FREQ2_RW_POSTDIV2_Msk) >> CA35SSC_PLL_FREQ2_RW_POSTDIV2_Pos;
+      break;
+    case 4:
+      pll_config->PLLState = ((RCC->PLL4CFGR1 & RCC_PLL4CFGR1_PLLEN) == RCC_PLL4CFGR1_PLLEN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL0_Msk) >> RCC_MUXSELCFGR_MUXSEL0_Pos;
+      pll_config->FREFDIV = (RCC->PLL4CFGR2 & RCC_PLL4CFGR2_FREFDIV_Msk) >> RCC_PLL4CFGR2_FREFDIV_Pos;
+      pll_config->FBDIV = (RCC->PLL4CFGR2 & RCC_PLL4CFGR2_FBDIV_Msk) >> RCC_PLL4CFGR2_FBDIV_Pos;
+      pll_config->FRACIN = (RCC->PLL4CFGR3 & RCC_PLL4CFGR3_FRACIN_Msk) >> RCC_PLL4CFGR3_FRACIN_Pos;
+      pll_config->POSTDIV1 = (RCC->PLL4CFGR6 & RCC_PLL4CFGR6_POSTDIV1_Msk) >> RCC_PLL4CFGR6_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (RCC->PLL4CFGR7 & RCC_PLL4CFGR7_POSTDIV2_Msk) >> RCC_PLL4CFGR7_POSTDIV2_Pos;
+      break;
+    case 5:
+      pll_config->PLLState = ((RCC->PLL5CFGR1 & RCC_PLL5CFGR1_PLLEN) == RCC_PLL5CFGR1_PLLEN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL0_Msk) >> RCC_MUXSELCFGR_MUXSEL0_Pos;
+      pll_config->FREFDIV = (RCC->PLL5CFGR2 & RCC_PLL5CFGR2_FREFDIV_Msk) >> RCC_PLL5CFGR2_FREFDIV_Pos;
+      pll_config->FBDIV = (RCC->PLL5CFGR2 & RCC_PLL5CFGR2_FBDIV_Msk) >> RCC_PLL5CFGR2_FBDIV_Pos;
+      pll_config->FRACIN = (RCC->PLL5CFGR3 & RCC_PLL5CFGR3_FRACIN_Msk) >> RCC_PLL5CFGR3_FRACIN_Pos;
+      pll_config->POSTDIV1 = (RCC->PLL5CFGR6 & RCC_PLL5CFGR6_POSTDIV1_Msk) >> RCC_PLL5CFGR6_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (RCC->PLL5CFGR7 & RCC_PLL5CFGR7_POSTDIV2_Msk) >> RCC_PLL5CFGR7_POSTDIV2_Pos;
+      break;
+    case 6:
+      pll_config->PLLState = ((RCC->PLL6CFGR1 & RCC_PLL6CFGR1_PLLEN) == RCC_PLL6CFGR1_PLLEN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL0_Msk) >> RCC_MUXSELCFGR_MUXSEL0_Pos;
+      pll_config->FREFDIV = (RCC->PLL6CFGR2 & RCC_PLL6CFGR2_FREFDIV_Msk) >> RCC_PLL6CFGR2_FREFDIV_Pos;
+      pll_config->FBDIV = (RCC->PLL6CFGR2 & RCC_PLL6CFGR2_FBDIV_Msk) >> RCC_PLL6CFGR2_FBDIV_Pos;
+      pll_config->FRACIN = (RCC->PLL6CFGR3 & RCC_PLL6CFGR3_FRACIN_Msk) >> RCC_PLL6CFGR3_FRACIN_Pos;
+      pll_config->POSTDIV1 = (RCC->PLL6CFGR6 & RCC_PLL6CFGR6_POSTDIV1_Msk) >> RCC_PLL6CFGR6_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (RCC->PLL6CFGR7 & RCC_PLL6CFGR7_POSTDIV2_Msk) >> RCC_PLL6CFGR7_POSTDIV2_Pos;
+      break;
+    case 7:
+      pll_config->PLLState = ((RCC->PLL7CFGR1 & RCC_PLL7CFGR1_PLLEN) == RCC_PLL7CFGR1_PLLEN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL0_Msk) >> RCC_MUXSELCFGR_MUXSEL0_Pos;
+      pll_config->FREFDIV = (RCC->PLL7CFGR2 & RCC_PLL7CFGR2_FREFDIV_Msk) >> RCC_PLL7CFGR2_FREFDIV_Pos;
+      pll_config->FBDIV = (RCC->PLL7CFGR2 & RCC_PLL7CFGR2_FBDIV_Msk) >> RCC_PLL7CFGR2_FBDIV_Pos;
+      pll_config->FRACIN = (RCC->PLL7CFGR3 & RCC_PLL7CFGR3_FRACIN_Msk) >> RCC_PLL7CFGR3_FRACIN_Pos;
+      pll_config->POSTDIV1 = (RCC->PLL7CFGR6 & RCC_PLL7CFGR6_POSTDIV1_Msk) >> RCC_PLL7CFGR6_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (RCC->PLL7CFGR7 & RCC_PLL7CFGR7_POSTDIV2_Msk) >> RCC_PLL7CFGR7_POSTDIV2_Pos;
+      break;
+    case 8:
+      pll_config->PLLState = ((RCC->PLL8CFGR1 & RCC_PLL8CFGR1_PLLEN) == RCC_PLL8CFGR1_PLLEN ? RCC_PLL_ON : RCC_PLL_OFF);
+      pll_config->PLLSource = (RCC->MUXSELCFGR & RCC_MUXSELCFGR_MUXSEL0_Msk) >> RCC_MUXSELCFGR_MUXSEL0_Pos;
+      pll_config->FREFDIV = (RCC->PLL8CFGR2 & RCC_PLL8CFGR2_FREFDIV_Msk) >> RCC_PLL8CFGR2_FREFDIV_Pos;
+      pll_config->FBDIV = (RCC->PLL8CFGR2 & RCC_PLL8CFGR2_FBDIV_Msk) >> RCC_PLL8CFGR2_FBDIV_Pos;
+      pll_config->FRACIN = (RCC->PLL8CFGR3 & RCC_PLL8CFGR3_FRACIN_Msk) >> RCC_PLL8CFGR3_FRACIN_Pos;
+      pll_config->POSTDIV1 = (RCC->PLL8CFGR6 & RCC_PLL8CFGR6_POSTDIV1_Msk) >> RCC_PLL8CFGR6_POSTDIV1_Pos;
+      pll_config->POSTDIV2 = (RCC->PLL8CFGR7 & RCC_PLL8CFGR7_POSTDIV2_Msk) >> RCC_PLL8CFGR7_POSTDIV2_Pos;
+      break;
+    default:
+      pll_config->PLLState = 0;
+      pll_config->PLLSource = 0;
+      pll_config->FREFDIV = 0;
+      pll_config->FBDIV = 0;
+      pll_config->FRACIN = 0;
+      pll_config->POSTDIV1 = 0;
+      pll_config->POSTDIV2 = 0;
+      break;
+  }
+}
+
+static uint32_t ComputePLLClockFreq(PLLInitTypeDef *pll)
+{
+  uint32_t source_freq;
+  uint64_t pll_output;
+
+  switch (pll->PLLSource)
+  {
+    case 0 : /* HSI */
+      source_freq = HSI_VALUE;
+      break;
+    case 1 : /* HSE */
+      source_freq = HSE_VALUE;
+      break;
+    case 2 : /* MSI */
+      source_freq = MSI_VALUE;
+      break;
+    default:
+      source_freq = 0;
+      break;
+  }
+
+  /* Compute PLL frequency from PLL parameters according to fractional mode selection */
+  /* Note : keep maximum computing precision by doubling integer resolution */
+  /*        and process numerator before applying dividers */
+  if (0 == pll->FRACIN)
+    pll_output = (uint64_t)source_freq * (uint64_t)pll->FBDIV;
+  else
+  {
+    pll_output = (uint64_t)source_freq * ((1<<24)*(uint64_t)pll->FBDIV + (uint64_t)pll->FRACIN);
+    pll_output /= (1<<24);
+  }
+  pll_output /= (uint64_t)(pll->FREFDIV * pll->POSTDIV1 * pll->POSTDIV2);
+
+  return (uint32_t)pll_output;
+}
+
+uint32_t SystemCoreClock = HSI_VALUE;
+
+/**
+  * @brief  Update SystemCoreClock variable according to Clock Register Values.
+  *         The SystemCoreClock variable contains the Cortex-A35 clock.
+  *         This clock can be ck_cpu1_ext2f, ck_cpu1_ext2f/2 or PLL1
+  *         CAUTION: A35 SYSTICK is not based on the clock of Cortex-A35.
+  *           It is based on STGEN IP which has it is own clock
+  *           (ck_ker_stgen flexgen channel) based on HSI by default
+  *
+  * @note   Each time the Cortex-A35 clock changes, this function must be called
+  *         to update SystemCoreClock variable value. Otherwise, any configuration
+  *         based on this variable will be incorrect.
+  *
+  * @param  None
+  * @retval None
+  */
+void SystemCoreClockUpdate(void)
+{
+  uint32_t        xbar_source;
+  uint32_t        xbar_source_freq;
+  PLLInitTypeDef  pll_config;
+  uint32_t        source_clock;
+
+  /* Check CA35 source (can be EXT2F or PLL1) */
+  source_clock = CA35SSC->CHGCLKREQ_RW & CA35SSC_CHGCLKREQ_RW_ARM_CHGCLKREQ;
+
+  if (source_clock == 0)
+  {
+    /* Return PLL1 frequency */
+    GetPLLxConfig(&pll_config, 1);
+    SystemCoreClock = ComputePLLClockFreq(&pll_config);
+  }
+  else
+  {
+    /* Identify xbar source for ck_cpu1_ext2f flexgen channel (channel 63) */
+    xbar_source = (uint32_t)(READ_BIT(RCC->XBARxCFGR[63], RCC_XBARxCFGR_XBARxSEL_Msk));
+
+    /* Then retrieve the source frequency */
+    switch (xbar_source)
+    {
+      case 0: /* PLL4 */
+        GetPLLxConfig(&pll_config, 4);
+        xbar_source_freq = ComputePLLClockFreq(&pll_config);
+        break;
+
+      case 1 : /* PLL5 */
+        GetPLLxConfig(&pll_config, 5);
+        xbar_source_freq = ComputePLLClockFreq(&pll_config);
+        break;
+
+      case 2 :/* PLL6 */
+        GetPLLxConfig(&pll_config, 6);
+        xbar_source_freq = ComputePLLClockFreq(&pll_config);
+        break;
+
+      case 3 : /* PLL7 */
+        GetPLLxConfig(&pll_config, 7);
+        xbar_source_freq = ComputePLLClockFreq(&pll_config);
+        break;
+
+      case 4 : /* PLL8 */
+        GetPLLxConfig(&pll_config, 8);
+        xbar_source_freq = ComputePLLClockFreq(&pll_config);
+        break;
+
+      case 5 : /* HSI */
+      case 8 : /* HSI_KER */
+        xbar_source_freq = HSI_VALUE;
+        break;
+
+      case 7 : /* MSI */
+      case 10 : /* MSI_KER */
+        xbar_source_freq = MSI_VALUE;
+        break;
+
+      case 6 : /* HSE */
+      case 9 : /* HSE_KER */
+        xbar_source_freq = HSE_VALUE;
+        break;
+
+      case 13 : /* LSI */
+        xbar_source_freq = LSI_VALUE;
+        break;
+
+      case 14 : /* LSE */
+        xbar_source_freq = LSE_VALUE;
+        break;
+
+      default:
+        xbar_source_freq = 0;
+        break;
+    }
+
+    SystemCoreClock = xbar_source_freq / (((RCC->FINDIVxCFGR[63] & RCC_FINDIVxCFGR_FINDIVx_Msk) + 1) * ((RCC->PREDIVxCFGR[63] & RCC_PREDIVxCFGR_PREDIVx_Msk) + 1));
+    if ((CA35SSC->CHGCLKREQ_RW & CA35SSC_CHGCLKREQ_RW_ARM_DIVSELACK) != CA35SSC_CHGCLKREQ_RW_ARM_DIVSELACK)
+    {
+      SystemCoreClock /= 2;
+    }
   }
 }
 
@@ -365,7 +558,8 @@ void SystemClock_Config(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line)
+void assert_failed(__attribute__((unused))uint8_t* file,
+                   __attribute__((unused))uint32_t line)
 {
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

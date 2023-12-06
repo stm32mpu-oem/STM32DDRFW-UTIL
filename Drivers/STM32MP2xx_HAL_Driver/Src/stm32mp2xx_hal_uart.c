@@ -1445,11 +1445,11 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, const uint8_t
           huart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CBR1_DEFAULT_OFFSET] = nbByte;
 
           /* Set DMA source address */
-          huart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = (uint32_t)huart->pTxBuffPtr;
+          huart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] = (unsigned long)huart->pTxBuffPtr;
 
           /* Set DMA destination address */
           huart->hdmatx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] =
-            (uint32_t)&huart->Instance->TDR;
+            (unsigned long)&huart->Instance->TDR;
 
           /* Enable the UART transmit DMA channel */
           status = HAL_DMAEx_List_Start_IT(huart->hdmatx);
@@ -1463,7 +1463,7 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, const uint8_t
       else
       {
         /* Enable the UART transmit DMA channel */
-        status = HAL_DMA_Start_IT(huart->hdmatx, (uint32_t)huart->pTxBuffPtr, (uint32_t)&huart->Instance->TDR, nbByte);
+        status = HAL_DMA_Start_IT(huart->hdmatx, (unsigned long)huart->pTxBuffPtr, (unsigned long)&huart->Instance->TDR, nbByte);
       }
 
       if (status != HAL_OK)
@@ -3587,11 +3587,11 @@ HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pDa
         huart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CBR1_DEFAULT_OFFSET] = nbByte;
 
         /* Set DMA source address */
-        huart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] =
-          (uint32_t)&huart->Instance->RDR;
+	huart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CSAR_DEFAULT_OFFSET] =
+          (unsigned long)&huart->Instance->RDR;
 
         /* Set DMA destination address */
-        huart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = (uint32_t)huart->pRxBuffPtr;
+        huart->hdmarx->LinkedListQueue->Head->LinkRegisters[NODE_CDAR_DEFAULT_OFFSET] = (unsigned long)huart->pRxBuffPtr;
 
         /* Enable the UART receive DMA channel */
         status = HAL_DMAEx_List_Start_IT(huart->hdmarx);
@@ -3605,7 +3605,7 @@ HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pDa
     else
     {
       /* Enable the UART receive DMA channel */
-      status = HAL_DMA_Start_IT(huart->hdmarx, (uint32_t)&huart->Instance->RDR, (uint32_t)huart->pRxBuffPtr, nbByte);
+      status = HAL_DMA_Start_IT(huart->hdmarx, (unsigned long)&huart->Instance->RDR, (unsigned long)huart->pRxBuffPtr, nbByte);
     }
 
     if (status != HAL_OK)

@@ -52,6 +52,7 @@ void UART_Config(void)
 {
   COM_InitTypeDef COM_Init;
 
+  BSP_COM_SelectLogPort(COM1);
   COM_Init.BaudRate   = UTIL_UART_BAUDRATE;
   COM_Init.Parity     = (COM_ParityTypeDef)UTIL_UART_PARITY;
   COM_Init.StopBits   = (COM_StopBitsTypeDef)UTIL_UART_STOPBITS;
@@ -116,7 +117,7 @@ uint32_t Serial_Scanf(uint32_t value)
 #endif
   if (tmp > value)
   {
-    printf("\n\r  !!! Please enter valid number between 0 and %lu \n", value);
+    printf("\n\r  !!! Please enter valid number between 0 and %u \n", value);
     return 0xFF;
   }
   return tmp;
@@ -163,7 +164,19 @@ void Error_Handler(void)
   while(1)
   {
     HAL_Delay(5000);
-   log_err("\n\r Error Handler \n\r");
-   log_dbg("\n\r Why is there an error? \n\r");
+    printf("\n\r Error Handler \n\r");
+    log_dbg("\n\r Why is there an error? \n\r");
+  }
+}
+
+void valid_delay_us(unsigned long delay_us)
+{
+  __IO uint32_t wait_loop_index = 0U;
+
+  wait_loop_index = (delay_us * (SystemCoreClock / (1000000UL * 2UL)));
+
+  while(wait_loop_index != 0UL)
+  {
+    wait_loop_index--;
   }
 }

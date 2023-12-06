@@ -9,7 +9,7 @@ header-includes: <link rel="icon" type="image/x-icon" href="_htmresc/favicon.png
 
 <center>
 # Release Notes for <mark>\ STM32MP25xx CMSIS </mark>
-Copyright &copy; 2022\ STMicroelectronics\
+Copyright &copy; 2023\ STMicroelectronics\
     
 [![ST logo](_htmresc/st_logo_2020.png)](https://www.st.com){.logo}
 </center>
@@ -35,12 +35,12 @@ Various template file are provided to easily build an application. They can be a
 
 ::: {.collapse}
 <input type="checkbox" id="collapse-section0" checked aria-hidden="true">
-<label for="collapse-section0" checked aria-hidden="true">__V0.1.0 / 18-November-2022__</label>
+<label for="collapse-section0" checked aria-hidden="true">__V0.3.0.rc5 / 13-Oct-2023__</label>
 <div>
 
 ## Main Changes
 
-This is a **Pre-Alpha Release** for STM32MP25xx CMSIS
+This is a **Beta RC5 Release** for STM32MP25xx CMSIS
 
 ## Contents
 

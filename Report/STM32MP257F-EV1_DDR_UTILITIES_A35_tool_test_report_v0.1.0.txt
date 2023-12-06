@@ -5,8 +5,8 @@
 /****** Bench Parameters ******/
 -------------------------------
 - Board             : STM32MP257F-EV1
-- Package version   : v0.1.0
-- Generated on      : Feb 17 2023
+- Package version   : v0.3.0
+- Generated on      : Nov 06 2023
 
  +------------------------------------------------------------------ +
       Test in terminal emulator appplication :

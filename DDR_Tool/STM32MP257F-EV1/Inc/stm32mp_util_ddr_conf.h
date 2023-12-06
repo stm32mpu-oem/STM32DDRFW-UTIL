@@ -20,12 +20,12 @@
 #ifndef __STM32MP_UTIL_DDR_CONF_H
 #define __STM32MP_UTIL_DDR_CONF_H
 
-#if (STM32MP_DDR4_TYPE && (DDR_SIZE_Gb == 16))
-  #include "stm32mp2xx-ddr4-2x8Gbits-2x16bits-template.h"
+#if (STM32MP_DDR4_TYPE && (DDR_SIZE_Gb == 32))
+  #include "stm32mp2xx-ddr4-2x16Gbits-2x16bits-template.h"
 #elif (STM32MP_DDR3_TYPE && (DDR_SIZE_Gb == 8))
   #include "stm32mp2xx-ddr3-2x4Gbits-2x16bits-template.h"
-#elif (STM32MP_LPDDR4_TYPE && (DDR_SIZE_Gb == 16))
-  #include "stm32mp2xx-lpddr4-1x16Gbits-1x32bits-template.h"
+#elif (STM32MP_LPDDR4_TYPE && (DDR_SIZE_Gb == 32))
+  #include "stm32mp2xx-lpddr4-1x32Gbits-1x32bits-template.h"
 #else
   #error "no DDR settings defined."
 #endif

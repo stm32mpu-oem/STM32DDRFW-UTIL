@@ -955,7 +955,7 @@ HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef  *pRCC_OscInitStruct)
   *
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef   *const pRCC_ClkInitStruct, uint32_t FLatency)
+HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef   *const pRCC_ClkInitStruct, __attribute__((unused)) uint32_t FLatency)
 {
   uint32_t tickstart;
   uint32_t backup_domain;
@@ -2041,7 +2041,7 @@ void HAL_RCC_GetOscConfig(RCC_OscInitTypeDef  *pRCC_OscInitStruct)
   * @param  pFLatency  This parameter is not used on STM32MP25.
   * @retval None
   */
-void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef  *pRCC_ClkInitStruct, uint32_t *pFLatency)
+void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef  *pRCC_ClkInitStruct, __attribute__((unused)) uint32_t *pFLatency)
 {
   pRCC_ClkInitStruct->ClockType = RCC_CLOCKTYPE_ICN_HS_MCU | RCC_CLOCKTYPE_ICN_LS_MCU | RCC_CLOCKTYPE_ICN_SDMMC |
                                   RCC_CLOCKTYPE_ICN_DDR | RCC_CLOCKTYPE_ICN_DISPLAY | RCC_CLOCKTYPE_ICN_HCL | RCC_CLOCKTYPE_ICN_NIC |
@@ -2377,7 +2377,7 @@ void HAL_RCC_IRQHandler(void)
   *                before cleaning them
   * @retval None
   */
-__weak void HAL_RCC_Callback(uint32_t Flags)
+__weak void HAL_RCC_Callback(__attribute__((unused)) uint32_t Flags)
 {
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_RCC_Callback could be implemented in the user file
@@ -2402,7 +2402,7 @@ void HAL_RCC_WAKEUP_IRQHandler(void)
   *                before cleaning them
   * @retval None
   */
-__weak void HAL_RCC_WAKEUP_Callback(uint32_t Flags)
+__weak void HAL_RCC_WAKEUP_Callback(__attribute__((unused)) uint32_t Flags)
 {
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_RCC_WAKEUP_Callback could be implemented in the user file
@@ -2427,7 +2427,7 @@ void HAL_RCC_HSIMON_IRQHandler(void)
   *                before cleaning them
   * @retval None
   */
-__weak void HAL_RCC_HSIMON_Callback(uint32_t Flags)
+__weak void HAL_RCC_HSIMON_Callback(__attribute__((unused)) uint32_t Flags)
 {
   /* NOTE : This function Should not be modified, when the callback is needed,
             the HAL_RCC_HSIMON_Callback could be implemented in the user file
